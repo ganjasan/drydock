@@ -1,6 +1,6 @@
 {
-  "name": "shipwright",
-  "displayName": "Shipwright",
+  "name": "drydock",
+  "displayName": "Drydock",
   "version": "0.0.1",
   "description": "A disciplined, AI-first development loop for Claude Code: requirements → build → ship.",
   "author": {
@@ -10,10 +10,10 @@
   "commands": "./commands",
   "agents": "./agents",
   "skills": "./skills",
-  "homepage": "https://github.com/TBD/shipwright",
+  "homepage": "https://github.com/ganjasan/drydock",
   "repository": {
     "type": "git",
-    "url": "https://github.com/TBD/shipwright.git"
+    "url": "https://github.com/ganjasan/drydock.git"
   },
   "keywords": [
     "claude-code",

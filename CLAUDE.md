@@ -1,10 +1,10 @@
-# Shipwright — Agent Instructions
+# Drydock — Agent Instructions
 
-You are working inside the Shipwright repository. Shipwright is a Claude Code plugin and methodology for disciplined, AI-first software development: requirements → build → ship.
+You are working inside the Drydock repository. Drydock is a Claude Code plugin and methodology for disciplined, AI-first software development: requirements → build → ship.
 
 ## Dogfooding principle
 
-**Shipwright uses Shipwright.** Every change to this repository follows the same workflow Shipwright itself teaches:
+**Drydock uses Drydock.** Every change to this repository follows the same workflow Drydock itself teaches:
 
 1. Capture intent as requirements (`requirements/` — vision, ADRs, use cases).
 2. Create an OpenSpec change under `openspec/changes/` before editing code.
@@ -22,13 +22,13 @@ When in doubt, prefer structure over speed — the project is its own test suite
 ## Structure
 
 ```
-shipwright/
-├── commands/       # /sw:req:*, /sw:build:*, /sw:ship:*, /sw:plan:* command files
+drydock/
+├── commands/       # /dd:req:*, /dd:build:*, /dd:ship:*, /dd:plan:* command files
 ├── agents/         # Subagents invoked by commands
 ├── skills/         # Reusable skills with optional templates/ and examples/
 ├── templates/      # Top-level templates shared across commands/skills
-├── requirements/   # Shipwright's own requirements (dogfood)
-├── openspec/       # Shipwright's own OpenSpec changes and specs (dogfood)
+├── requirements/   # Drydock's own requirements (dogfood)
+├── openspec/       # Drydock's own OpenSpec changes and specs (dogfood)
 └── docs/           # Methodology, workflow, catalog
 ```
 
@@ -42,7 +42,7 @@ shipwright/
 
 ## Do not
 
-- Do not add ties to a specific SaaS, company, or domain — Shipwright is universal. Domain specifics belong in consumer projects.
+- Do not add ties to a specific SaaS, company, or domain — Drydock is universal. Domain specifics belong in consumer projects.
 - Do not introduce backward-compatibility shims for APZ command names. A one-time migration guide lives in `docs/migration-from-apz.md`.
 - Do not auto-push or auto-release. Releases are explicit and gated by the ship pipeline.
 

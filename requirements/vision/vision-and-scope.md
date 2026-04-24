@@ -1,5 +1,5 @@
 ---
-title: "Shipwright Vision and Scope"
+title: "Drydock Vision and Scope"
 version: "0.1.0"
 created: 2026-04-24
 updated: 2026-04-24
@@ -8,7 +8,7 @@ status: draft
 
 # Vision and Scope Document
 
-**Проект:** Shipwright — A disciplined, AI-first development loop for Claude Code
+**Проект:** Drydock — A disciplined, AI-first development loop for Claude Code
 **Версия:** 0.1.0
 **Дата:** 24.04.2026
 **Автор:** Artem Konuchov
@@ -44,22 +44,22 @@ status: draft
 
 ### 1.2 Business Opportunity
 
-Shipwright — самостоятельный, универсальный Claude Code плагин и методология разработки, реализующий цикл Req → Build → Ship с акцентом на трассируемость и дисциплину.
+Drydock — самостоятельный, универсальный Claude Code плагин и методология разработки, реализующий цикл Req → Build → Ship с акцентом на трассируемость и дисциплину.
 
 **Для кого создаётся:**
 
 - **Первичный пользователь:** автор — для собственных SaaS-проектов и экспериментов, требующих строгой трассируемости требований и изменений.
 - **Вторичная аудитория:** solo-developer'ы и маленькие команды, использующие Claude Code как основной инструмент и желающие перейти от хаотичного «vibe coding» к повторяемому процессу.
-- **Третичная аудитория:** консультанты/менторы, которые могут использовать Shipwright как учебный инструмент для демонстрации инженерной дисциплины в AI-ассистированной разработке.
+- **Третичная аудитория:** консультанты/менторы, которые могут использовать Drydock как учебный инструмент для демонстрации инженерной дисциплины в AI-ассистированной разработке.
 
 ### 1.3 Business Objectives and Success Criteria
 
 | ID   | Бизнес-цель                                                                                                | Критерий успеха                                                                                                          | Срок          |
 |------|------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------|---------------|
-| BO-1 | Извлечь универсальное ядро APZ в самостоятельный плагин Shipwright                                         | Все Apilize-специфичные ссылки удалены; миграционный гайд для APZ → Shipwright написан и проверен на реальном переносе  | Релиз v0.1    |
-| BO-2 | Shipwright работает «из коробки» в новом проекте без ручной конфигурации                                   | `git clone shipwright` + установка плагина → доступны `/sw:req:*`, `/sw:build:*`, `/sw:ship:*` в любом проекте           | Релиз v0.1    |
+| BO-1 | Извлечь универсальное ядро APZ в самостоятельный плагин Drydock                                         | Все Apilize-специфичные ссылки удалены; миграционный гайд для APZ → Drydock написан и проверен на реальном переносе  | Релиз v0.1    |
+| BO-2 | Drydock работает «из коробки» в новом проекте без ручной конфигурации                                   | `git clone drydock` + установка плагина → доступны `/dd:req:*`, `/dd:build:*`, `/dd:ship:*` в любом проекте           | Релиз v0.1    |
 | BO-3 | Репозиторий сам следует своей методологии (dogfooding)                                                     | Все изменения после v0.1 идут через OpenSpec-changes; все фичи имеют трассировку в ADR/Vision; 100 % требований в `requirements/` | Релиз v0.1 и далее |
-| BO-4 | Shipwright становится рабочей зависимостью FASTSAAS                                                        | FASTSAAS успешно использует Shipwright как CORE-модуль (FE-CORE-11 в FASTSAAS VnS); команды работают в FASTSAAS-проекте | +1 мес от v0.1|
+| BO-4 | Drydock становится рабочей зависимостью FASTSAAS                                                        | FASTSAAS успешно использует Drydock как CORE-модуль (FE-CORE-11 в FASTSAAS VnS); команды работают в FASTSAAS-проекте | +1 мес от v0.1|
 | BO-5 | Достичь органической видимости среди Claude Code community                                                 | ≥ 100 GitHub stars и ≥ 5 внешних проектов, использующих плагин                                                          | +6 мес от v0.1|
 
 > *Assumption: BO-5 предполагает публичный репозиторий под MIT. Если плагин остаётся личным — цель снимается.*
@@ -76,11 +76,11 @@ Shipwright — самостоятельный, универсальный Claude
 
 | ID   | Описание риска                                                                                                                       | Вероятность | Влияние | Стратегия                                                                                                   |
 |------|--------------------------------------------------------------------------------------------------------------------------------------|-------------|---------|-------------------------------------------------------------------------------------------------------------|
-| BR-1 | Разрыв с APZ: расхождение двух плагинов приводит к двойной поддержке                                                                 | В           | В       | После v0.1 APZ становится тонкой обёрткой над Shipwright с Apilize-специфичными дополнениями; миграция     |
+| BR-1 | Разрыв с APZ: расхождение двух плагинов приводит к двойной поддержке                                                                 | В           | В       | После v0.1 APZ становится тонкой обёрткой над Drydock с Apilize-специфичными дополнениями; миграция     |
 | BR-2 | Эволюция Claude Code API (plugins, skills, agents) ломает плагин                                                                     | С           | В       | Минимизировать использование нестабильных API; CI-прогон на актуальной версии раз в неделю                |
 | BR-3 | OpenSpec как основа build-loop меняет формат артефактов                                                                              | С           | С       | Изолировать OpenSpec-интеграцию в отдельный модуль; держать версию в зависимостях                         |
-| BR-4 | Методология воспринимается как «слишком тяжёлая» для простых задач                                                                   | С           | С       | Ввести режимы: `/sw:build:ff` (fast-forward для тривиальных задач); документировать когда не использовать |
-| BR-5 | Имя «Shipwright» уже занято в другой категории софта и вызывает путаницу                                                             | Н           | С       | Проверить npm/GitHub/PyPI перед публикацией; при коллизии — использовать `shipwright-cc` или переименовать |
+| BR-4 | Методология воспринимается как «слишком тяжёлая» для простых задач                                                                   | С           | С       | Ввести режимы: `/dd:build:ff` (fast-forward для тривиальных задач); документировать когда не использовать |
+| BR-5 | Будущая коллизия имени: кто-то регистрирует `drydock` в npm/PyPI/крупной GitHub-организации раньше нас                                | Н           | С       | На момент ADR-0001 имя свободно (проверено). Зарегистрировать npm/PyPI-пакеты `drydock` одновременно с публикацией репозитория; fallback — `drydock-cc` или `drydock-claude` |
 
 ---
 
@@ -90,8 +90,8 @@ Shipwright — самостоятельный, универсальный Claude
 
 **FOR** автора и других solo-developer'ов, работающих с Claude Code как основным инструментом
 **WHO** хотят превратить «vibe coding» в дисциплинированный, повторяемый процесс с полной трассируемостью от требования до релиза
-**THE** Shipwright **IS A** универсальный Claude Code плагин и методология
-**THAT** даёт готовый цикл «Требование → Проект изменения → Код → Тесты → PR → Релиз» с командами `/sw:req:*`, `/sw:build:*`, `/sw:ship:*` и библиотекой скиллов, шаблонов и sub-агентов
+**THE** Drydock **IS A** универсальный Claude Code плагин и методология
+**THAT** даёт готовый цикл «Требование → Проект изменения → Код → Тесты → PR → Релиз» с командами `/dd:req:*`, `/dd:build:*`, `/dd:ship:*` и библиотекой скиллов, шаблонов и sub-агентов
 **UNLIKE** ad-hoc промптов, внутренних плагинов, привязанных к конкретной компании (как APZ к Apilize), или тяжёлых корпоративных ALM-инструментов (Jira / Azure DevOps)
 **OUR PRODUCT** лёгкий, opensource, domain-agnostic, интегрирован с Wiegers и OpenSpec, и применяется к своей же разработке (dogfooding).
 
@@ -99,17 +99,17 @@ Shipwright — самостоятельный, универсальный Claude
 
 | ID      | Название фичи                      | Описание                                                                                                                  | Связанные BO |
 |---------|------------------------------------|---------------------------------------------------------------------------------------------------------------------------|--------------|
-| FE-1    | Command suite `/sw:req:*`          | Команды для requirements: vision, stakeholder, use-case, adr, review                                                      | BO-1, BO-2   |
-| FE-2    | Command suite `/sw:build:*`        | Команды build-loop: start, explore, design, code, test                                                                    | BO-1, BO-2   |
-| FE-3    | Command suite `/sw:ship:*`         | Команды ship: pr, archive, release                                                                                        | BO-1, BO-2   |
-| FE-4    | Command suite `/sw:plan:*`         | Команды планирования: add, triage, promote (backlog → change)                                                             | BO-2         |
+| FE-1    | Command suite `/dd:req:*`          | Команды для requirements: vision, stakeholder, use-case, adr, review                                                      | BO-1, BO-2   |
+| FE-2    | Command suite `/dd:build:*`        | Команды build-loop: start, explore, design, code, test                                                                    | BO-1, BO-2   |
+| FE-3    | Command suite `/dd:ship:*`         | Команды ship: pr, archive, release                                                                                        | BO-1, BO-2   |
+| FE-4    | Command suite `/dd:plan:*`         | Команды планирования: add, triage, promote (backlog → change)                                                             | BO-2         |
 | FE-5    | Skill library                      | Вигерс-скиллы (vision-and-scope, use-case, stakeholder-profile, requirements-review, requirements-elicitation)           | BO-1         |
 | FE-6    | Template library                   | Шаблоны документов: V&S, ADR, use-case, stakeholder profile, OpenSpec delta                                               | BO-1, BO-2   |
 | FE-7    | Sub-agents                         | Специализированные агенты: code-reviewer, explorer, traces-linter, release-coordinator, raw-classifier                   | BO-2         |
-| FE-8    | OpenSpec integration               | Встроенная поддержка OpenSpec changes/specs; команды `/sw:build:design` и `/sw:ship:archive` работают с `openspec/`      | BO-1, BO-2   |
+| FE-8    | OpenSpec integration               | Встроенная поддержка OpenSpec changes/specs; команды `/dd:build:design` и `/dd:ship:archive` работают с `openspec/`      | BO-1, BO-2   |
 | FE-9    | GitHub Projects integration (opt)  | Опциональная интеграция с GitHub Projects для backlog и трекинга — через `gh` CLI, universal (не Apilize Project #2)     | BO-2         |
 | FE-10   | Dogfood requirements                | Собственные `requirements/` и `openspec/` этого репозитория                                                               | BO-3         |
-| FE-11   | Migration guide APZ → Shipwright   | `docs/migration-from-apz.md`: команды, пути, что менять при переходе                                                      | BO-1         |
+| FE-11   | Migration guide APZ → Drydock   | `docs/migration-from-apz.md`: команды, пути, что менять при переходе                                                      | BO-1         |
 | FE-12   | Installation & bootstrap            | `README`, `CLAUDE.md` и `.claude/` установочный скрипт, позволяющий подключить плагин в любой проект одной командой     | BO-2, BO-4   |
 
 ### 2.3 Assumptions and Dependencies
@@ -119,7 +119,7 @@ Shipwright — самостоятельный, универсальный Claude
 - **AS-1:** Claude Code остаётся основным потребителем плагина; другие AI-coding-агенты (Cursor, Windsurf) — вне scope v0.1.
 - **AS-2:** OpenSpec остаётся основой build-loop как наиболее подходящий формат для AI-ассистированных изменений.
 - **AS-3:** Модель распространения — opensource MIT. *TBD: подтвердить.*
-- **AS-4:** Пользователи имеют установленный `gh` CLI (для команд `/sw:plan:*` и `/sw:ship:pr`).
+- **AS-4:** Пользователи имеют установленный `gh` CLI (для команд `/dd:plan:*` и `/dd:ship:pr`).
 
 **Зависимости:**
 
@@ -136,10 +136,10 @@ Shipwright — самостоятельный, универсальный Claude
 
 В v0.1 входит:
 
-- **FE-1…FE-4** — полный набор команд `/sw:req:*`, `/sw:build:*`, `/sw:ship:*`, `/sw:plan:*` в объёме текущего APZ.
+- **FE-1…FE-4** — полный набор команд `/dd:req:*`, `/dd:build:*`, `/dd:ship:*`, `/dd:plan:*` в объёме текущего APZ.
 - **FE-5, FE-6, FE-7** — портированные скиллы, шаблоны, sub-агенты — без Apilize-специфики.
 - **FE-8** — OpenSpec-интеграция.
-- **FE-10** — собственные requirements/openspec Shipwright.
+- **FE-10** — собственные requirements/openspec Drydock.
 - **FE-11** — migration guide.
 - **FE-12** — README, CLAUDE.md, установка.
 
@@ -152,8 +152,8 @@ Shipwright — самостоятельный, универсальный Claude
 **v0.2 (ожидается +1–2 мес):**
 
 - Универсальная GitHub Projects integration (FE-9 full).
-- Конфиг-слой: per-project `.shipwright/config.yaml` для override умолчаний.
-- Расширенные `/sw:build:*` сценарии (ff-режим, parallel-changes).
+- Конфиг-слой: per-project `.drydock/config.yaml` для override умолчаний.
+- Расширенные `/dd:build:*` сценарии (ff-режим, parallel-changes).
 
 **v0.3:**
 
@@ -168,13 +168,13 @@ Shipwright — самостоятельный, универсальный Claude
 
 ### 3.3 Limitations and Exclusions
 
-Следующее **НЕ входит** в scope Shipwright:
+Следующее **НЕ входит** в scope Drydock:
 
 1. **Apilize-специфика** — ссылки на apilize-hub, клиентские проекты, внутренние структуры. Всё это остаётся в APZ как тонкой обёртке.
 2. **Домен-специфичный контент** — финансовое моделирование, SaaS-бизнес-логика, конкретные вертикали.
-3. **Собственный trackers-бэкенд** — Shipwright не заменяет Linear, Jira, GitHub Projects; он их использует.
+3. **Собственный trackers-бэкенд** — Drydock не заменяет Linear, Jira, GitHub Projects; он их использует.
 4. **IDE-интеграции помимо Claude Code** — Cursor, Windsurf, continue.dev — вне scope v0.x.
-5. **Автоматическая генерация кода** без involvement пользователя — Shipwright ассистирует, не автогенерирует фичи «сам по себе».
+5. **Автоматическая генерация кода** без involvement пользователя — Drydock ассистирует, не автогенерирует фичи «сам по себе».
 6. **Обучающий курс/книга** — методология задокументирована в `docs/`, но полноценного курса нет.
 7. **Локализация команд** — названия команд и CLI-интерфейс только en; контент документов — по усмотрению автора.
 
@@ -187,7 +187,7 @@ Shipwright — самостоятельный, универсальный Claude
 | Стейкхолдер                | Роль в проекте                   | Основные интересы                                                                                          | Уровень влияния |
 |----------------------------|----------------------------------|------------------------------------------------------------------------------------------------------------|-----------------|
 | Artem Konuchov             | Owner, первичный пользователь    | Универсальный, переиспользуемый workflow; dogfooding; чистое отделение от APZ                             | Высокий         |
-| FASTSAAS как консумер       | Внутренний потребитель           | Shipwright как CORE-модуль FASTSAAS; стабильность команд                                                  | Высокий         |
+| FASTSAAS как консумер       | Внутренний потребитель           | Drydock как CORE-модуль FASTSAAS; стабильность команд                                                  | Высокий         |
 | Solo-developer (похожий)   | Вторичный пользователь           | Готовый workflow для Claude Code без необходимости разбираться в Apilize-специфике                        | Средний         |
 | Claude Code / AI-агент     | Исполнитель команд плагина       | Предсказуемые конвенции; явные шаблоны; минимум неоднозначностей                                          | Средний         |
 | OSS-сообщество             | Контрибьюторы / критики          | Качество кода, документация, лицензия                                                                     | Низкий — Средний|
@@ -214,7 +214,7 @@ Shipwright — самостоятельный, универсальный Claude
 
 **Целевая среда:**
 
-Shipwright — Claude Code plugin. Установка: `claude plugin install <repo-url>` (или эквивалент актуальной версии Claude Code). После установки команды `/sw:*` доступны глобально.
+Drydock — Claude Code plugin. Установка: `claude plugin install <repo-url>` (или эквивалент актуальной версии Claude Code). После установки команды `/dd:*` доступны глобально.
 
 **Миграция данных:**
 
@@ -236,24 +236,24 @@ Shipwright — Claude Code plugin. Установка: `claude plugin install <r
 
 | Термин               | Определение                                                                                                                            |
 |----------------------|----------------------------------------------------------------------------------------------------------------------------------------|
-| Shipwright           | Claude Code plugin и методология разработки Req → Build → Ship.                                                                        |
-| APZ                  | Внутренний Apilize-Claude Code плагин, исторический предок Shipwright. После v0.1 становится тонкой обёрткой над Shipwright.          |
+| Drydock           | Claude Code plugin и методология разработки Req → Build → Ship.                                                                        |
+| APZ                  | Внутренний Apilize-Claude Code плагин, исторический предок Drydock. После v0.1 становится тонкой обёрткой над Drydock.          |
 | Req → Build → Ship   | Три фазы workflow: requirements → implementation loop → release.                                                                       |
 | OpenSpec             | Формат/инструмент для описания изменений кодовой базы как артефактов (changes, deltas, specs).                                         |
 | ADR                  | Architectural Decision Record — формат решения с контекстом, вариантами и последствиями.                                               |
-| Dogfooding           | Использование собственного продукта для собственной разработки. Shipwright разрабатывается с использованием Shipwright.                |
+| Dogfooding           | Использование собственного продукта для собственной разработки. Drydock разрабатывается с использованием Drydock.                |
 | Vibe Coding          | Режим разработки, в котором значительную часть кодовой базы пишет/правит AI-агент; требует структурированной кодовой базы.             |
 
 ### 5.2 Связанные документы
 
 | Документ                                             | Расположение                                                              |
 |------------------------------------------------------|---------------------------------------------------------------------------|
-| ADR-0001: Name (Shipwright)                          | `requirements/adr/0001-name-shipwright.md`                                |
+| ADR-0001: Name (Drydock)                          | `requirements/adr/0001-name-drydock.md`                                |
 | ADR-0002: Dogfooding as a principle                  | `requirements/adr/0002-dogfooding-as-principle.md`                        |
 | Methodology overview                                 | `docs/methodology.md`                                                     |
 | Workflow (Req → Build → Ship)                        | `docs/workflow.md`                                                        |
 | Skills catalog                                       | `docs/skills-catalog.md`                                                  |
-| Migration guide APZ → Shipwright                     | `docs/migration-from-apz.md` *(планируется к v0.1)*                       |
+| Migration guide APZ → Drydock                     | `docs/migration-from-apz.md` *(планируется к v0.1)*                       |
 | FASTSAAS Vision and Scope (консумер)                 | `../fastsaas/requirements/vision/vision-and-scope.md`                     |
 
 ---

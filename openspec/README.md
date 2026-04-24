@@ -1,6 +1,6 @@
 # openspec/
 
-Shipwright's OWN OpenSpec changes and specs — this is the dogfooding surface (see ADR-0002).
+Drydock's OWN OpenSpec changes and specs — this is the dogfooding surface (see ADR-0002).
 
 ## Layout
 
@@ -10,4 +10,4 @@ Shipwright's OWN OpenSpec changes and specs — this is the dogfooding surface (
 
 ## First change
 
-The first OpenSpec change in this repository will be the port of APZ command files into Shipwright's `commands/` directory. Until then, this directory is empty by design.
+The first OpenSpec change in this repository will be the port of APZ command files into Drydock's `commands/` directory. Until then, this directory is empty by design.

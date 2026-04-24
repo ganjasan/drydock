@@ -1,6 +1,6 @@
 # Workflow
 
-Concrete, step-by-step: how a change goes from idea to merged code under Shipwright.
+Concrete, step-by-step: how a change goes from idea to merged code under Drydock.
 
 ## Quick reference
 
@@ -8,43 +8,43 @@ Concrete, step-by-step: how a change goes from idea to merged code under Shipwri
 Idea
   │
   ▼
-/sw:plan:add           ── captures idea as backlog item (GitHub issue)
+/dd:plan:add           ── captures idea as backlog item (GitHub issue)
   │
   ▼
-/sw:plan:triage        ── assigns priority, area, phase
+/dd:plan:triage        ── assigns priority, area, phase
   │
   ▼
-/sw:plan:promote       ── promotes issue to OpenSpec change in the right repo
+/dd:plan:promote       ── promotes issue to OpenSpec change in the right repo
   │
   ▼
-/sw:build:start        ── creates branch + worktree + change skeleton
+/dd:build:start        ── creates branch + worktree + change skeleton
   │
-  ├── /sw:build:explore  ── (optional) Q&A for ambiguous scope
+  ├── /dd:build:explore  ── (optional) Q&A for ambiguous scope
   │
-  ├── /sw:build:design   ── generate proposal + design + tasks
+  ├── /dd:build:design   ── generate proposal + design + tasks
   │
-  ├── /sw:build:code     ── implement from tasks list
+  ├── /dd:build:code     ── implement from tasks list
   │
-  └── /sw:build:test     ── run suite
+  └── /dd:build:test     ── run suite
   │
   ▼
-/sw:ship:pr            ── open PR with linked change
+/dd:ship:pr            ── open PR with linked change
   │
   ▼
  (review & merge)
   │
   ▼
-/sw:ship:archive       ── archive change, sync deltas to specs
+/dd:ship:archive       ── archive change, sync deltas to specs
   │
   ▼
-/sw:ship:release       ── (when appropriate) cut release, tag, changelog
+/dd:ship:release       ── (when appropriate) cut release, tag, changelog
 ```
 
 Cross-cutting:
 
-- `/sw:req:*` — requirements can be updated at any point; they often lead `/sw:plan:add`.
-- `/sw:status` — show where you are (branch, worktree, open PRs, active change).
-- `/sw:next` — suggest the next concrete action based on current state.
+- `/dd:req:*` — requirements can be updated at any point; they often lead `/dd:plan:add`.
+- `/dd:status` — show where you are (branch, worktree, open PRs, active change).
+- `/dd:next` — suggest the next concrete action based on current state.
 
 ## Walkthrough: typical feature
 
@@ -55,7 +55,7 @@ A feature request exists ("add a dark mode toggle") but is not yet captured.
 ### 1. Capture
 
 ```
-/sw:plan:add "Dark mode toggle in header"
+/dd:plan:add "Dark mode toggle in header"
 ```
 
 Creates a GitHub issue with the right labels and template.
@@ -63,7 +63,7 @@ Creates a GitHub issue with the right labels and template.
 ### 2. Triage
 
 ```
-/sw:plan:triage
+/dd:plan:triage
 ```
 
 Assigns `Priority: P2`, `Area: ui/theming`, `Phase: MVP+1`.
@@ -71,7 +71,7 @@ Assigns `Priority: P2`, `Area: ui/theming`, `Phase: MVP+1`.
 ### 3. Promote to a change
 
 ```
-/sw:plan:promote <issue-number>
+/dd:plan:promote <issue-number>
 ```
 
 Creates `openspec/changes/2026-05-01-dark-mode-toggle/` with:
@@ -84,7 +84,7 @@ Creates `openspec/changes/2026-05-01-dark-mode-toggle/` with:
 ### 4. Start building
 
 ```
-/sw:build:start <change-id>
+/dd:build:start <change-id>
 ```
 
 Creates a git worktree, checks out a branch, opens the change in context.
@@ -92,7 +92,7 @@ Creates a git worktree, checks out a branch, opens the change in context.
 ### 5. Explore (if needed)
 
 ```
-/sw:build:explore
+/dd:build:explore
 ```
 
 Q&A mode. Output lands back into `proposal.md` / `design.md`.
@@ -100,7 +100,7 @@ Q&A mode. Output lands back into `proposal.md` / `design.md`.
 ### 6. Design
 
 ```
-/sw:build:design
+/dd:build:design
 ```
 
 Generates or updates the three OpenSpec artifacts based on current understanding.
@@ -108,15 +108,15 @@ Generates or updates the three OpenSpec artifacts based on current understanding
 ### 7. Code
 
 ```
-/sw:build:code
+/dd:build:code
 ```
 
-Pick up the next unchecked task in `tasks.md`. Shipwright marks items complete as they ship.
+Pick up the next unchecked task in `tasks.md`. Drydock marks items complete as they ship.
 
 ### 8. Test
 
 ```
-/sw:build:test
+/dd:build:test
 ```
 
 Runs the repo's suite per conventions (real DB for integration, GIVEN/WHEN/THEN docstrings, etc. — whatever the repo's CLAUDE.md declares).
@@ -124,19 +124,19 @@ Runs the repo's suite per conventions (real DB for integration, GIVEN/WHEN/THEN 
 ### 9. PR
 
 ```
-/sw:ship:pr
+/dd:ship:pr
 ```
 
 Opens a PR with links back to the change, the originating issue, and any traces.
 
 ### 10. Merge
 
-Happens externally (reviewer, CI). Shipwright doesn't auto-merge.
+Happens externally (reviewer, CI). Drydock doesn't auto-merge.
 
 ### 11. Archive
 
 ```
-/sw:ship:archive
+/dd:ship:archive
 ```
 
 Runs verification (`traces-linter` subagent), syncs deltas from the change into `openspec/specs/`, archives the change.
@@ -144,7 +144,7 @@ Runs verification (`traces-linter` subagent), syncs deltas from the change into 
 ### 12. Release (when appropriate)
 
 ```
-/sw:ship:release
+/dd:ship:release
 ```
 
 Determines release order (if multi-repo), runs gates, bumps version, generates changelog, tags.
@@ -163,7 +163,7 @@ Anything that changes **observable behavior** — even by one character — goes
 
 ## Dogfooding self-check
 
-If you are working *inside* the Shipwright repository itself, every rule above applies to Shipwright's own development. That's the whole point of ADR-0002.
+If you are working *inside* the Drydock repository itself, every rule above applies to Drydock's own development. That's the whole point of ADR-0002.
 
 ## See also
 

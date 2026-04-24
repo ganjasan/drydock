@@ -1,6 +1,6 @@
 # skills/
 
-Reusable Claude Code skills used by Shipwright commands.
+Reusable Claude Code skills used by Drydock commands.
 
 Each skill lives in its own directory:
 
@@ -17,6 +17,6 @@ skills/
 └── adr/
 ```
 
-Skills are designed to be standalone — they can be invoked directly by users, not only through Shipwright commands.
+Skills are designed to be standalone — they can be invoked directly by users, not only through Drydock commands.
 
 See [../docs/skills-catalog.md](../docs/skills-catalog.md) for descriptions.

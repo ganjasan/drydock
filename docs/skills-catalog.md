@@ -1,6 +1,6 @@
 # Skills Catalog
 
-Shipwright ships (pun intended) a small, curated set of skills. Each skill is reusable across commands and can also be invoked directly.
+Drydock ships (pun intended) a small, curated set of skills. Each skill is reusable across commands and can also be invoked directly.
 
 Skills follow the Claude Code Skill convention: a `SKILL.md` with YAML frontmatter (`name`, `description`, triggering heuristics) and an optional `templates/` and `examples/` directory.
 
@@ -8,67 +8,67 @@ Skills follow the Claude Code Skill convention: a `SKILL.md` with YAML frontmatt
 
 ### vision-and-scope
 
-Create a Wiegers-style Vision & Scope document. Invoked by `/sw:req:vision`.
+Create a Wiegers-style Vision & Scope document. Invoked by `/dd:req:vision`.
 
 ### use-case
 
-Write a Wiegers/Cockburn use case (primary actor, trigger, main success scenario, extensions, etc.). Invoked by `/sw:req:use-case`.
+Write a Wiegers/Cockburn use case (primary actor, trigger, main success scenario, extensions, etc.). Invoked by `/dd:req:use-case`.
 
 ### stakeholder-profile
 
-Create detailed stakeholder profiles. Invoked by `/sw:req:stakeholder`.
+Create detailed stakeholder profiles. Invoked by `/dd:req:stakeholder`.
 
 ### requirements-elicitation
 
-Prepare an elicitation plan — stakeholders, techniques, scheduling. Invoked by `/sw:req:elicit`.
+Prepare an elicitation plan — stakeholders, techniques, scheduling. Invoked by `/dd:req:elicit`.
 
 ### requirements-review
 
-Review requirements against Wiegers quality criteria (clear, complete, consistent, feasible, necessary, prioritized, testable, unambiguous). Invoked by `/sw:req:review`.
+Review requirements against Wiegers quality criteria (clear, complete, consistent, feasible, necessary, prioritized, testable, unambiguous). Invoked by `/dd:req:review`.
 
 ### adr
 
-Create an Architectural Decision Record with auto-numbering and traceability frontmatter. Invoked by `/sw:req:adr`.
+Create an Architectural Decision Record with auto-numbering and traceability frontmatter. Invoked by `/dd:req:adr`.
 
 ## Build skills
 
 ### openspec-new-change
 
-Create a new OpenSpec change with proposal/design/tasks skeleton. Invoked by `/sw:build:start`.
+Create a new OpenSpec change with proposal/design/tasks skeleton. Invoked by `/dd:build:start`.
 
 ### openspec-continue-change
 
-Advance a change to the next artifact. Invoked by `/sw:build:continue`.
+Advance a change to the next artifact. Invoked by `/dd:build:continue`.
 
 ### openspec-apply-change
 
-Work through the tasks list of an active change. Invoked by `/sw:build:code`.
+Work through the tasks list of an active change. Invoked by `/dd:build:code`.
 
 ### openspec-ff-change
 
-Fast-forward mode — generate all change artifacts in one pass for well-understood work. Invoked by `/sw:build:ff`.
+Fast-forward mode — generate all change artifacts in one pass for well-understood work. Invoked by `/dd:build:ff`.
 
 ### openspec-explore
 
-Q&A mode for ambiguous scope. Invoked by `/sw:build:explore`.
+Q&A mode for ambiguous scope. Invoked by `/dd:build:explore`.
 
 ### openspec-verify-change
 
-Pre-archive verification: code matches the change, tasks all checked, specs deltas consistent. Invoked by `/sw:build:verify`.
+Pre-archive verification: code matches the change, tasks all checked, specs deltas consistent. Invoked by `/dd:build:verify`.
 
 ## Ship skills
 
 ### openspec-archive-change
 
-Archive a completed change after merge. Invoked by `/sw:ship:archive`.
+Archive a completed change after merge. Invoked by `/dd:ship:archive`.
 
 ### openspec-sync-specs
 
-Sync deltas from a change into main specs. Invoked by `/sw:ship:sync` (also called by archive).
+Sync deltas from a change into main specs. Invoked by `/dd:ship:sync` (also called by archive).
 
 ### openspec-bulk-archive
 
-Archive multiple parallel completed changes in one pass. Invoked by `/sw:ship:bulk-archive`.
+Archive multiple parallel completed changes in one pass. Invoked by `/dd:ship:bulk-archive`.
 
 ## Sub-agents (not skills, but related)
 

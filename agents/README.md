@@ -1,6 +1,6 @@
 # agents/
 
-Claude Code sub-agents invoked by Shipwright commands. Each agent is a Markdown file with a YAML frontmatter block (`name`, `description`, `tools`) and a system prompt body.
+Claude Code sub-agents invoked by Drydock commands. Each agent is a Markdown file with a YAML frontmatter block (`name`, `description`, `tools`) and a system prompt body.
 
 Planned agents (ported from APZ during v0.1):
 

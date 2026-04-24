@@ -5,7 +5,7 @@ date: 2026-04-24
 deciders: Artem Konuchov
 traces_to:
   vision: "requirements/vision/vision-and-scope.md"
-  related_adr: "requirements/adr/0001-name-shipwright.md"
+  related_adr: "requirements/adr/0001-name-drydock.md"
 ---
 
 # ADR-0002: Dogfooding as a first-class principle
@@ -16,13 +16,13 @@ Accepted — 2026-04-24.
 
 ## Context
 
-Shipwright is a methodology-as-code plugin: it teaches a disciplined Req → Build → Ship workflow. The fastest way for a methodology to become stale, incoherent, or detached from reality is to be developed **without** following itself.
+Drydock is a methodology-as-code plugin: it teaches a disciplined Req → Build → Ship workflow. The fastest way for a methodology to become stale, incoherent, or detached from reality is to be developed **without** following itself.
 
-APZ was developed organically — changes happened faster than the methodology was formalized. That was appropriate for an internal, single-user plugin. Shipwright is being extracted as a standalone product with an external audience; the bar for coherence is higher.
+APZ was developed organically — changes happened faster than the methodology was formalized. That was appropriate for an internal, single-user plugin. Drydock is being extracted as a standalone product with an external audience; the bar for coherence is higher.
 
 ## Decision
 
-**Shipwright is developed using Shipwright.** Every non-trivial change to this repository goes through the same loop Shipwright itself prescribes:
+**Drydock is developed using Drydock.** Every non-trivial change to this repository goes through the same loop Drydock itself prescribes:
 
 1. A business/user need is captured as a requirement artifact (`requirements/vision/`, `requirements/use-cases/`, `requirements/adr/`) before code changes.
 2. An OpenSpec change is created under `openspec/changes/` before implementation.
@@ -42,7 +42,7 @@ APZ was developed organically — changes happened faster than the methodology w
 
 **Negative:**
 
-- Overhead on every change. **Mitigation:** a clearly-scoped "trivial" exception list; `/sw:build:ff` fast-forward mode for small, well-understood changes.
+- Overhead on every change. **Mitigation:** a clearly-scoped "trivial" exception list; `/dd:build:ff` fast-forward mode for small, well-understood changes.
 - The repository's history will appear slower than typical OSS repos. **Mitigation:** the slowness *is* the demonstration — it's not a side-effect.
 
 **Neutral:**
@@ -52,5 +52,5 @@ APZ was developed organically — changes happened faster than the methodology w
 ## Follow-ups
 
 - [ ] Draft the "trivial change" exception list in `docs/workflow.md`.
-- [ ] Implement `/sw:build:ff` fast-forward command.
+- [ ] Implement `/dd:build:ff` fast-forward command.
 - [ ] Add a `CONTRIBUTING.md` referencing this ADR.

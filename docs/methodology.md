@@ -1,16 +1,16 @@
 # Methodology
 
-Shipwright turns AI-assisted development into a disciplined, traceable loop. It combines three well-established bodies of work and adds a minimal glue layer on top:
+Drydock turns AI-assisted development into a disciplined, traceable loop. It combines three well-established bodies of work and adds a minimal glue layer on top:
 
 1. **Karl Wiegers' requirements engineering** — vision & scope, stakeholder profiles, use cases, ADRs, requirements review.
 2. **OpenSpec** — changes-as-artifacts: each modification of behavior is described before it is implemented, with a tasks list and deltas that fold back into living specs.
 3. **Claude Code** — as the execution environment (plugin, skills, agents, MCP).
 
-The core claim of Shipwright is simple: **the bottleneck in AI-assisted software development is not generation speed — it is coherence.** A Claude Code session that produces 500 lines of code in an hour is only valuable if those 500 lines are traceable to a requirement, reviewable against a spec, and safe to ship.
+The core claim of Drydock is simple: **the bottleneck in AI-assisted software development is not generation speed — it is coherence.** A Claude Code session that produces 500 lines of code in an hour is only valuable if those 500 lines are traceable to a requirement, reviewable against a spec, and safe to ship.
 
 ## Three phases
 
-### 1. Requirements (`/sw:req:*`)
+### 1. Requirements (`/dd:req:*`)
 
 Capture intent before writing code.
 
@@ -22,7 +22,7 @@ Capture intent before writing code.
 
 The deliverable is *alignment*, not pages. Short documents that actually get read beat exhaustive ones that don't.
 
-### 2. Build (`/sw:build:*`)
+### 2. Build (`/dd:build:*`)
 
 Each change to system behavior goes through an OpenSpec change:
 
@@ -34,7 +34,7 @@ Each change to system behavior goes through an OpenSpec change:
 
 The deliverable is *working code with a matching change artifact*. The change is a forcing function: it makes the AI (and the human) think before typing.
 
-### 3. Ship (`/sw:ship:*`)
+### 3. Ship (`/dd:ship:*`)
 
 Every change reaches the main branch through the same pipeline:
 
@@ -46,15 +46,15 @@ The deliverable is *trust*: a release where every line of code is defensibly whe
 
 ## Non-goals
 
-Shipwright is not:
+Drydock is not:
 
 - A project manager. It does not track status for you; it integrates with existing trackers (GitHub Projects, Linear).
 - A generator. It does not invent features. It supports the human in making thoughtful ones.
 - A replacement for engineering judgment. It is scaffolding; what you build on top is still yours.
 
-## When not to use Shipwright
+## When not to use Drydock
 
-Shipwright's overhead is worth it when changes have **non-trivial blast radius** — multiple files, user-facing behavior, or cross-cutting concerns. For one-off scripts, throwaway experiments, or pure research code, skip the workflow entirely; using Shipwright there is cosplay, not craft.
+Drydock's overhead is worth it when changes have **non-trivial blast radius** — multiple files, user-facing behavior, or cross-cutting concerns. For one-off scripts, throwaway experiments, or pure research code, skip the workflow entirely; using Drydock there is cosplay, not craft.
 
 ## Further reading
 
