@@ -1,0 +1,27 @@
+{
+  "name": "shipwright",
+  "displayName": "Shipwright",
+  "version": "0.0.1",
+  "description": "A disciplined, AI-first development loop for Claude Code: requirements → build → ship.",
+  "author": {
+    "name": "Artem Konuchov"
+  },
+  "license": "MIT",
+  "commands": "./commands",
+  "agents": "./agents",
+  "skills": "./skills",
+  "homepage": "https://github.com/TBD/shipwright",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/TBD/shipwright.git"
+  },
+  "keywords": [
+    "claude-code",
+    "claude-code-plugin",
+    "methodology",
+    "requirements",
+    "wiegers",
+    "openspec",
+    "workflow"
+  ]
+}
