@@ -85,6 +85,6 @@
 
 - [x] 9.1 Run `/dd:build:verify` (or `/opsx:verify`) against `openspec/changes/port-apz-commands/` to confirm tasks are checked, specs deltas are consistent, and design references match — `openspec validate port-apz-commands` reports "Change 'port-apz-commands' is valid"
 - [x] 9.2 Run `traces-linter` agent to confirm no orphaned or broken references among new artifacts — manual scan passed: every `traces_to:` reference in real frontmatter (ADR-0001, ADR-0002, ADR-0003) resolves; remaining `traces_to:` mentions are inside skill/command templates (instructional, not data)
-- [ ] 9.3 Manually install the plugin into a throwaway scratch repo (no Drydock-specific files) and verify `/dd:status`, `/dd:next`, `/dd:req:adr "test"` all work end-to-end — **deferred**: requires the user to install the plugin and exercise it interactively
-- [ ] 9.4 Open the PR via `/dd:ship:pr` (dogfood) linking back to this change — **deferred**: post-implementation step, owned by the user
-- [ ] 9.5 After merge, run `/dd:ship:archive` to finalize the change and sync deltas into `openspec/specs/` — **deferred**: post-merge step, owned by the user
+- [ ] 9.3 Manually install the plugin into a throwaway scratch repo (no Drydock-specific files) and verify `/dd:status`, `/dd:next`, `/dd:req:adr "test"` all work end-to-end — **deferred**: requires the user to install the plugin (e.g. symlink `~/.claude/plugins/drydock → /home/artem/Documents/Projects/drydock` and add to `enabledPlugins` in `~/.claude/settings.json`) and exercise it interactively
+- [x] 9.4 Open the PR via `/dd:ship:pr` (dogfood) linking back to this change — **skipped**: change committed directly to `main` (commit `876406f`) per user direction; rationale recorded in `.openspec.yaml: direct_to_main_reason`
+- [x] 9.5 After merge, run `/dd:ship:archive` to finalize the change and sync deltas into `openspec/specs/` — closed via `openspec archive` (see archive log)

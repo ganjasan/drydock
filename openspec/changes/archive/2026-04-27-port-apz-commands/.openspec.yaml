@@ -1,0 +1,11 @@
+schema: spec-driven
+created: 2026-04-24
+implementation_commit: 876406f
+direct_to_main: true
+direct_to_main_reason: |
+  Per user direction "давай пока в мастер лить" on 2026-04-27, this change
+  was committed directly to main (commit 876406f) without opening a PR.
+  Task 9.4 (open dogfood PR via /dd:ship:pr) is therefore explicitly skipped
+  rather than deferred. This is acceptable for a green-field v0.1 port where
+  the change has no external reviewers; future changes that touch shipped
+  behavior should follow the standard PR flow.
