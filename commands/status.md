@@ -24,7 +24,23 @@ Collect and print, in this order:
 - **Linked issue**: if the active change frontmatter includes a `linked_issue` key, OR the branch matches `feature/<N>-*`, fetch that issue via `gh issue view <N> --json number,title,state,labels,url` and show one line.
 - **Open PRs by user**: `gh pr list --author @me --state open --json number,title,url` for the current repo. List each on one line.
 
-### 3. Project snapshot (only if configured)
+### 3. Raw inbox (only if a raw root exists)
+
+```bash
+raw_root="$(cfg_get paths.raw_root)"
+incoming_subdir="$(cfg_get paths.raw_subdirs.incoming)"
+inbox_dir="<repo-root>/${raw_root}/${incoming_subdir}"
+```
+
+If `${inbox_dir}` does not exist AND no `raw.*` config is declared, omit this section. Otherwise report the count of `*.md` files in `_incoming/` and (if available) the timestamp of the most recent classified item under `${raw_root}/<other-subdir>/` (proxy for "last `/dd:raw:process` invocation").
+
+```
+┃   Raw inbox:    12 in _incoming · last process: 4 days ago
+```
+
+If the inbox is empty: `┃   Raw inbox:    — clean`.
+
+### 4. Project snapshot (only if configured)
 
 If `cfg_has github.project.number` returns true:
 
@@ -48,6 +64,8 @@ Example shape (with project configured):
 ┃   OpenSpec change: add-dark-mode  (proposal ✓, design ✓, tasks 3/7)
 ┃   Linked issue:    my-org/my-repo#42  (open)
 ┃   Open PRs:        my-org/my-repo#11 (draft)
+┣ Raw inbox
+┃   12 in _incoming · last process: 4 days ago
 ┣ Project
 ┃   18 items: 12 Backlog · 4 In progress · 2 In review · 0 Done
 ```

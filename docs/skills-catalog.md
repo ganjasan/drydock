@@ -30,25 +30,25 @@ Review requirements against the eight Wiegers quality criteria (clear, complete,
 
 Create an Architectural Decision Record with auto-numbering and traceability frontmatter. Wrapped by `/dd:req:adr`. File: `skills/adr/SKILL.md`.
 
-## Raw skills *(planned for v0.2 — see [ADR-0004](../requirements/adr/0004-universal-workflow-and-project-extensions.md))*
+## Raw skills
 
-The `raw` phase is added in v0.2 via the `add-raw-phase` OpenSpec change. The skills below are the planned shape; nothing is shipped yet.
+Shipped in v0.2 via the `add-raw-phase` OpenSpec change. Each skill is standalone-invokable; commands under `/dd:raw:*` are thin wrappers.
 
-### raw-capture *(planned)*
+### raw-capture
 
-Manual capture of an external signal into `raw/_incoming/` with structured frontmatter (source, date, parties, raw text). Wrapped by `/dd:raw:capture`.
+Manual capture of an external signal into `<repo>/<paths.raw_root>/_incoming/` with structured frontmatter (source, dedup_key, captured_at, parties, topics, …). File: `skills/raw-capture/SKILL.md`. Wrapped by `/dd:raw:capture`.
 
-### raw-process *(planned)*
+### raw-process
 
-Classify `raw/_incoming/` into `raw/meetings/`, `raw/feedback/`, `raw/ideas/`, `raw/competitors/`, `raw/client-boards/`. Dedup; cross-link to existing requirements and issues; suggest backlog items. Wrapped by `/dd:raw:process`. Invokes the `raw-classifier` subagent.
+Classify the inbox into `meetings/`, `feedback/`, `ideas/`, `competitors/`, `client-boards/` (defaults; customizable via `raw.classifier.categories`). Dedup by `dedup_key`; cross-link to existing requirements and open issues; suggest backlog items. Wrapped by `/dd:raw:process`. Invokes the `raw-classifier` subagent.
 
-### raw-ingest-{gmail, calendar, drive, notion, linear, github} *(planned)*
+### raw-ingest-{gmail, calendar, drive, notion, linear, github}
 
-One skill per source. Reads filter config from `<repo>/.drydock/config.yaml` under `raw.<source>.*`; pulls items via the corresponding MCP server; writes to `raw/_incoming/`. Wrapped by `/dd:raw:ingest-<source>`.
+One skill per source. Reads filter config from `<repo>/.drydock/config.yaml` under `raw.<source>.*`; pulls items via the corresponding MCP server (or `gh` CLI for `github`); writes to `_incoming/` with the universal frontmatter schema; fires `post-capture` hook per item. Wrapped by `/dd:raw:ingest-<source>`.
 
-### raw-transcribe *(planned)*
+### raw-transcribe
 
-Transcribe an audio/video file referenced in a raw entry (typically a Meet recording) to text and fold the transcript into `raw/meetings/`. Wrapped by `/dd:raw:transcribe`.
+Transcribe an audio/video file referenced in a raw entry's `attachments` (typically a Meet recording) and fold the transcript into the meetings subfolder. Provider and model come from `raw.transcribe.*` config. File: `skills/raw-transcribe/SKILL.md`. Wrapped by `/dd:raw:transcribe`.
 
 ## Build skills
 
@@ -99,7 +99,7 @@ Subagents live under `agents/` and are invoked by commands and skills via the Ag
 - **code-architect** — produces designs in the shape of an OpenSpec `design.md` section.
 - **traces-linter** — verifies bidirectional `traces_to` frontmatter references.
 - **release-coordinator** — orchestrates multi-repo releases (only invoked when `config.yaml` declares dependent repos).
-- **raw-classifier** *(planned for v0.2)* — classifies items in `raw/_incoming/` into the correct subfolder, dedups, cross-links. Invoked by the `raw-process` skill via `/dd:raw:process`. Moves into Drydock from APZ as part of the `add-raw-phase` change (ADR-0004).
+- **raw-classifier** — classifies items in `<raw_root>/_incoming/` into the configured category set; dedups; suggests cross-links. Read-only — does not move files. Invoked by the `raw-process` skill via `/dd:raw:process`. File: `agents/raw-classifier.md`.
 
 ## Conventions
 

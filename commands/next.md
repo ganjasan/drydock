@@ -11,6 +11,20 @@ Load merged Drydock configuration via `source "${CLAUDE_PLUGIN_ROOT}/lib/config.
 
 Work through these checks in order; emit the **first** match as the suggested next step.
 
+### 0. Raw inbox is non-empty
+
+```bash
+raw_root="$(cfg_get paths.raw_root)"
+incoming="${raw_root}/$(cfg_get paths.raw_subdirs.incoming)"
+inbox_dir="<repo-root>/${incoming}"
+```
+
+If `${inbox_dir}` exists and contains one or more `*.md` files:
+
+→ `/dd:raw:process` — classify · dedup · cross-link the inbox before starting new work. Cite the file count.
+
+This check is intentionally first: it's cheap, the data has provenance, and processing the inbox often surfaces parent-work that should jump the queue.
+
 ### 1. Active OpenSpec change with unfinished work
 
 If the current repo contains `openspec/changes/<slug>/.openspec.yaml` with status not `done`:

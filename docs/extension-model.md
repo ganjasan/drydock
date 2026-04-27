@@ -66,7 +66,7 @@ The full schema and built-in defaults are listed in [`templates/extension/config
 - **`worktree.*`** — `worktree.enabled`, `worktree.base_dir`, `worktree.naming`, `worktree.branch_naming`. Tokens supported in naming templates: `<issue-id>`, `<slug>`.
 - **`area_to_repo`** — Map from issue-Area value to target repo path. Edge cases: `.` for current repo, absolute paths, relative paths (resolved against parent of current repo). When `area_to_repo` is set but the requested area is not in the map, `/dd:plan:promote` aborts with a fail-loud message.
 - **`release.*`** — `release.gates` (slash-command references), `release.repos` (multi-repo coordination with `depends_on`), `release.block_on_labels`, `release.dry_run_default`.
-- **`raw.*`** — Per-source ingestion config: `raw.gmail.*`, `raw.calendar.*`, `raw.drive.*`, `raw.notion.*`, `raw.linear.*`, `raw.github.*`, `raw.transcribe.*`, `raw.classifier.*`. Populated by the [`add-raw-phase`](../openspec/changes/add-raw-phase/) change; see also the schema reference in that change's spec.
+- **`raw.*`** — Per-source ingestion config consumed by `/dd:raw:ingest-*` commands. See § "Raw phase configuration" below for the full schema.
 
 ### Reading config from a command
 
@@ -87,6 +87,85 @@ Direct reads of `${CLAUDE_PLUGIN_ROOT}/config.yaml` from command files are forbi
 ### Alternate locations are rejected
 
 Drydock searches **only** at `<repo>/.drydock/config.yaml`. Configuration files at `<repo>/drydock.yaml` or `<repo>/.drydock.yaml` cause the loader to abort with a "non-supported location" error rather than silently ignoring them — this prevents users from relying on a path Drydock will never read.
+
+## Raw phase configuration
+
+The `/dd:raw:*` commands read every source-specific filter, ID, and window from `raw.*` config keys. Universal defaults; per-repo values plug in via `<repo>/.drydock/config.yaml`.
+
+### Source filters
+
+| Source | Keys | Semantics |
+|---|---|---|
+| `gmail` | `query` (string), `labels_to_track` (list), `since_days` (int, default 7) | Combined into Gmail's search syntax: `query AND label:<each> AND newer_than:<since_days>d` |
+| `calendar` | `calendar_ids` (list), `look_back_days` (int, default 7), `look_ahead_days` (int, default 14) | Time window for event ingestion |
+| `drive` | `folder_ids` (list), `file_types` (list of mime types), `since_days` (int, default 7) | Files matching mime types modified in window |
+| `notion` | `databases` (list of `{id, label}`) | Per-database watermarked pulls |
+| `linear` | `teams` (list), `filter` (Linear filter expression) | Issues + comments updated since per-team watermark |
+| `github` | `repos` (list of `<owner>/<repo>`), `since_days` (int, default 7) | Issues + comments from external repos (the current repo is never targeted) |
+
+### Transcription
+
+| Key | Type | Purpose |
+|---|---|---|
+| `raw.transcribe.provider` | string | e.g. `openai-whisper`, `google-stt`, `deepgram` |
+| `raw.transcribe.model` | string | provider-specific model identifier |
+
+`/dd:raw:transcribe` aborts when `provider` is unset.
+
+### Classifier categories
+
+| Key | Type | Default |
+|---|---|---|
+| `raw.classifier.categories` | list of `{name, description}` | `[meetings, feedback, ideas, competitors, client-boards]` with documented descriptions |
+
+Custom category sets are honored. The classifier requires at least two categories; fewer triggers a refusal.
+
+### Frontmatter schema for raw entries
+
+Every file written into the raw inbox by `/dd:raw:capture` or `/dd:raw:ingest-*` carries this frontmatter (required keys must be present):
+
+```yaml
+---
+source: <gmail | calendar | drive | notion | linear | github | manual>
+captured_at: <ISO 8601 UTC datetime when Drydock filed the item>
+dedup_key: <deterministic per-item identifier — stable across re-runs>
+# optional:
+captured_by: claude-code:/dd:raw:<command-name>
+original_at: <ISO 8601 — when the source itself recorded, e.g. email send time>
+parties: [<emails or names mentioned>]
+links: [<URLs referenced>]
+attachments: [<file references — paths or "drive:<file-id>">]
+topics: [<short lowercase tags>]
+proposed_category: <category-name or empty>
+traces_to:
+  use_cases: [<UC-NNN ids>]
+  adrs: [<NNNN-slug>]
+  issues: [<owner/repo#num>]
+  raw: [<paths to other raw entries>]
+# source-specific blocks (optional, depending on `source`):
+gmail:    { thread_id, labels: [...] }
+calendar: { calendar_id, start, end, location, recurrence }
+drive:    { file_id, mime_type, size_bytes, is_recording }
+notion:   { page_id, database_id, database_label, properties: {...} }
+linear:   { team, identifier, status, priority, assignee }
+github:   { repo, number, state, author }
+transcribe: { provider, model, transcribed_at }
+---
+```
+
+### Per-source `dedup_key` schemes
+
+| Source | `dedup_key` |
+|---|---|
+| `manual` | `manual:<sha256-of-body>` |
+| `gmail` | `gmail:<message-id>` |
+| `calendar` | `calendar:<event-id>` |
+| `drive` | `drive:<file-id>` |
+| `notion` | `notion:<page-id>` |
+| `linear` | `linear:<identifier>` (e.g. `linear:ENG-123`) |
+| `github` | `github:<owner>/<repo>#<num>` |
+
+Collisions are merged, not duplicated — `/dd:raw:process` unions frontmatter and concatenates bodies under a `--- duplicate captured at <captured_at> ---` separator.
 
 ## Lifecycle hooks
 
