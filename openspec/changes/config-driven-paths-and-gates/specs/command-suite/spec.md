@@ -48,8 +48,8 @@ The `/dd:plan:promote` and `/dd:build:start` commands SHALL resolve the issue's 
 - **WHEN** `area_to_repo: {docs: .}` is configured and `/dd:plan:promote 42` runs on an issue with `Area: docs`
 - **THEN** the change MUST be created in the current repo (no `cd` to elsewhere)
 
-#### Scenario: Relative path resolved against parent of current repo
-- **WHEN** the current repo is at `/home/me/work/hub` and `area_to_repo: {frontend: ../frontend}` is configured and `/dd:plan:promote 42` runs on an issue with `Area: frontend`
+#### Scenario: Relative path resolved against parent of current repo (sibling-name pattern)
+- **WHEN** the current repo is at `/home/me/work/hub` and `area_to_repo: {frontend: frontend}` is configured and `/dd:plan:promote 42` runs on an issue with `Area: frontend`
 - **THEN** the command MUST cd into `/home/me/work/frontend` before creating the change
 
 #### Scenario: Absolute path used verbatim

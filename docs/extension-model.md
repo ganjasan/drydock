@@ -68,18 +68,99 @@ The full schema and built-in defaults are listed in [`templates/extension/config
 - **`release.*`** — `release.gates` (slash-command references), `release.repos` (multi-repo coordination with `depends_on`), `release.block_on_labels`, `release.dry_run_default`.
 - **`raw.*`** — Per-source ingestion config consumed by `/dd:raw:ingest-*` commands. See § "Raw phase configuration" below for the full schema.
 
-### Reading config from a command
+### paths.* and worktree.*
 
-Commands source the loader and read keys via helpers:
+| Key | Type | Default |
+|---|---|---|
+| `paths.requirements` | string | `requirements` |
+| `paths.requirements_subdirs.vision` | string | `vision` |
+| `paths.requirements_subdirs.stakeholders` | string | `stakeholders` |
+| `paths.requirements_subdirs.use_cases` | string | `use-cases` |
+| `paths.requirements_subdirs.adr` | string | `adr` |
+| `paths.openspec.changes` | string | `openspec/changes` |
+| `paths.openspec.specs` | string | `openspec/specs` |
+| `paths.raw_root` | string | `raw` |
+| `paths.raw_subdirs.{incoming,meetings,feedback,ideas,competitors,client_boards}` | string | `_incoming`, `meetings`, `feedback`, `ideas`, `competitors`, `client-boards` |
+| `worktree.enabled` | bool | `false` |
+| `worktree.base_dir` | string (absolute or relative-to-repo) | `.worktrees` |
+| `worktree.naming` | template (tokens: `<issue-id>`, `<slug>`) | `wt-<issue-id>` |
+| `worktree.branch_naming` | template (tokens: `<issue-id>`, `<slug>`) | `feature/<issue-id>-<slug>` |
+
+Templates accept exactly two tokens: `<issue-id>` and `<slug>`. Unknown tokens produce an error from `dd_branch_name` / `dd_worktree_dir` (additional tokens require a documented schema bump).
+
+### area_to_repo (five edge cases)
+
+`area_to_repo` is a map from issue-Area string to target repo path. Resolution via `dd_resolve_area`:
+
+| # | Condition | Behavior | Example |
+|---|---|---|---|
+| 1 | `area_to_repo` unset entirely | Current repo | (no entry) → `<repo>` |
+| 2 | Set, area not in map | Fail loud with copy-pasteable mapping snippet | `area_to_repo: {a: b}`, asking `c` → error |
+| 3 | Value is `.` | Current repo | `docs: .` → `<repo>` |
+| 4 | Absolute path | Used verbatim | `shared: /opt/shared-repo` → `/opt/shared-repo` |
+| 5 | Relative path (sibling-name pattern) | `<parent-of-current-repo>/<value>` | `frontend: my-frontend` from `/me/work/hub` → `/me/work/my-frontend` |
+
+The sibling-name pattern (entry 5) is the typical multi-repo workspace shape: hub plus siblings.
+
+### release.* full schema
+
+| Key | Type | Default | Purpose |
+|---|---|---|---|
+| `release.gates` | list of slash-command references | `[]` | Sequenced commands run before tag; any non-zero aborts |
+| `release.block_on_labels` | list of strings | `[]` | Open issues with any listed label abort the release |
+| `release.dry_run_default` | bool | `false` | When true, `/dd:ship:release` requires `--apply` to mutate |
+| `release.repos` | list of `{name, path, depends_on[]}` | `[]` | Multi-repo coordination — ≥ 2 entries triggers the agent |
+
+**Multi-repo example:**
+
+```yaml
+release:
+  repos:
+    - name: protocol
+      path: ../protocol           # sibling repo
+      depends_on: []
+    - name: sdk
+      path: ../sdk
+      depends_on: [protocol]
+    - name: platform
+      path: ../platform
+      depends_on: [protocol, sdk]
+```
+
+Topological order via Kahn's algorithm with alphabetical tie-break: `[protocol, sdk, platform]`. Cycles abort the entire release before any side effect.
+
+### github.project_fields (opt-in field setting)
+
+Plan commands set GitHub Projects v2 field values via `dd_project_field_set`. Each field is opt-in: declare `github.project_fields.<name>.id` and `.options.<key>` to enable; absent → silent no-op. Currently supported: `status`, `priority`, `phase`, `area`.
+
+Derive field IDs and option IDs once per project:
 
 ```bash
-source "${CLAUDE_PLUGIN_ROOT}/lib/config.sh"
-dd_config_load                                  # idempotent; materializes the merged config
+gh project field-list <project-number> --owner <org> --format json \
+  | jq '.fields[] | {id, name, options: ([.options[]? | {id, name}])}'
+```
 
-triage_label="$(cfg_get github.triage_label)"   # scalar
-gates="$(cfg_array_get release.gates)"          # newline-separated list
-areas="$(cfg_keys_of area_to_repo)"             # newline-separated keys
-if cfg_has github.project.id; then ... fi       # presence check
+Drop the resulting IDs into `github.project_fields.*` in your `<repo>/.drydock/config.yaml`.
+
+### Reading config from a command
+
+Commands source the loaders and read via helpers:
+
+```bash
+source "${CLAUDE_PLUGIN_ROOT}/lib/config.sh";       dd_config_load
+source "${CLAUDE_PLUGIN_ROOT}/lib/paths.sh"          # dd_path / dd_branch_name / dd_worktree_dir
+source "${CLAUDE_PLUGIN_ROOT}/lib/area_routing.sh"   # dd_resolve_area
+source "${CLAUDE_PLUGIN_ROOT}/lib/gh_project.sh"     # dd_project_field_set
+
+triage_label="$(cfg_get github.triage_label)"        # scalar
+gates="$(cfg_array_get release.gates)"               # newline-separated list
+areas="$(cfg_keys_of area_to_repo)"                  # newline-separated keys
+if cfg_has github.project.id; then ... fi            # presence check
+
+req_dir="$(dd_path requirements_subdir vision)"      # absolute path
+branch="$(dd_branch_name 42 dark-mode)"              # token-substituted name
+target="$(dd_resolve_area frontend)"                 # routing
+dd_project_field_set "$item" status ready             # opt-in field set
 ```
 
 Direct reads of `${CLAUDE_PLUGIN_ROOT}/config.yaml` from command files are forbidden; the merged loader is the only supported access path.

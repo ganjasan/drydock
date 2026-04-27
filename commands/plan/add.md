@@ -47,7 +47,15 @@ Apply `<config.github.triage_label>` (default `status/needs-triage`) if any requ
 
 If `cfg_has github.project.id`:
 - The Action `add-to-project` may pick the issue up automatically.
-- Set explicit project fields via `gh project item-edit` using the field IDs from `cfg_get github.project_fields.<field>.id` (e.g. `status`, `priority`, `area`, `phase`).
+- Set explicit project fields via the helper:
+  ```bash
+  source "${CLAUDE_PLUGIN_ROOT}/lib/gh_project.sh"
+  dd_project_field_set "$item_id" status   backlog       # or "ready"
+  dd_project_field_set "$item_id" priority "$priority"
+  dd_project_field_set "$item_id" area     "$area"
+  dd_project_field_set "$item_id" phase    "$phase"
+  ```
+  Each call no-ops silently when the corresponding field block is unconfigured.
 
 If no project is configured: skip — the issue lives at the repo level only.
 

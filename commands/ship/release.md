@@ -4,7 +4,7 @@ argument-hint: "<bump: major|minor|patch> [--dry-run]"
 allowed-tools: Bash, Read, Write, Edit, SlashCommand
 ---
 
-Run a release pipeline for the current repo. Load merged Drydock config (`source "${CLAUDE_PLUGIN_ROOT}/lib/config.sh"; dd_config_load`) and the hook dispatcher (`source "${CLAUDE_PLUGIN_ROOT}/lib/hooks.sh"`). Single-repo by default; if `cfg_array_get release.repos | wc -l` is ≥ 2, the `release-coordinator` agent is invoked to sequence cross-repo effects.
+Run a release pipeline for the current repo. Load merged Drydock config (`source "${CLAUDE_PLUGIN_ROOT}/lib/config.sh"; dd_config_load`) and the hook dispatcher (`source "${CLAUDE_PLUGIN_ROOT}/lib/hooks.sh"`). Single-repo by default; if `release.repos` has two or more entries (`jq '.release.repos | length // 0' "$DRYDOCK_CONFIG_PATH"`), the `release-coordinator` agent is invoked to sequence cross-repo effects.
 
 Argument: `$ARGUMENTS`:
 - `<bump>` — `major`, `minor`, or `patch`
@@ -108,9 +108,15 @@ gh release create v<new-version> \
 
 ### 11. Multi-repo coordination (only if configured)
 
-If `cfg_array_get release.repos` returns two or more entries (each with `depends_on:` relationships), spawn the `release-coordinator` agent. The agent computes order, propagates pins downstream, and prepares a cross-repo announcement.
+Check repo count: `repo_count=$(jq '.release.repos | length // 0' "$DRYDOCK_CONFIG_PATH")`. If `repo_count >= 2`, spawn the `release-coordinator` agent (`subagent_type: dd:release-coordinator`) passing the full `release.repos` list and the originating change. The agent:
 
-If only the current repo is in scope, **do not** invoke the coordinator.
+1. Verifies invocation criterion (≥ 2 entries).
+2. Computes topological order from each entry's `depends_on` using Kahn's algorithm with alphabetical tie-break.
+3. Detects cycles — aborts before any release work in any repo if a cycle is present.
+4. Executes per-repo release flow in order, propagating downstream version pins.
+5. Prepares a cross-repo announcement.
+
+If `repo_count <= 1`, **do not** invoke the coordinator — the current single-repo flow above is final.
 
 ### 12. Optional artifact build (project-specific)
 

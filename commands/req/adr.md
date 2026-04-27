@@ -10,7 +10,13 @@ Argument: `$ARGUMENTS` — short title (e.g. "ingestion orchestration choice").
 
 ## Procedure
 
-1. Load merged Drydock config (`source "${CLAUDE_PLUGIN_ROOT}/lib/config.sh"; dd_config_load`). Resolve target directory: `<repo-root>/$(cfg_get paths.requirements)/$(cfg_get paths.requirements_subdirs.adr)/` (defaults `requirements/adr/`).
+1. Load Drydock config and path resolver:
+   ```bash
+   source "${CLAUDE_PLUGIN_ROOT}/lib/config.sh"; dd_config_load
+   source "${CLAUDE_PLUGIN_ROOT}/lib/paths.sh"
+   target_dir="$(dd_path requirements_subdir adr)"
+   ```
+   Defaults `<repo>/requirements/adr/`; per-repo overrides via `paths.requirements` + `paths.requirements_subdirs.adr`.
 
 2. Invoke the `adr` skill with `$ARGUMENTS` as the title and the resolved directory as the target. The skill handles:
    - Auto-numbering (4-digit, locally scoped).
