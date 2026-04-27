@@ -3,9 +3,11 @@ description: Open a PR linking the active OpenSpec change and originating issue
 allowed-tools: Bash, Read, SlashCommand
 ---
 
-Open a pull request for the current branch. Links back to the active OpenSpec change and the originating GitHub issue. No GitHub Project assumption — works with or without `config.yaml`.
+Open a pull request for the current branch. Links back to the active OpenSpec change and the originating GitHub issue. Project Board integration is optional — works with or without a configured GitHub Project.
 
 ## Procedure
+
+Load merged Drydock config (`source "${CLAUDE_PLUGIN_ROOT}/lib/config.sh"; dd_config_load`) and the hook dispatcher (`source "${CLAUDE_PLUGIN_ROOT}/lib/hooks.sh"`).
 
 ### 1. Preflight
 
@@ -13,6 +15,17 @@ Open a pull request for the current branch. Links back to the active OpenSpec ch
 - Working tree clean, all commits pushed to the remote branch (offer to push if not).
 - Active OpenSpec change exists with all tasks checked. If `tasks.md` has unchecked items, refuse and suggest `/dd:build:code`.
 - Tests are recently green (`/dd:build:test`). Offer to run if not recent.
+
+### 1a. Pre-PR lifecycle hook
+
+Build payload with `branch` (current branch from `git rev-parse --abbrev-ref HEAD`) and `commits` (SHAs ahead of `main` from `git rev-list main..HEAD`):
+
+```bash
+extra=$(jq -cn --arg b "$branch" --argjson c "$commits_json" '{branch: $b, commits: $c}')
+dd_hook_invoke pre-pr "$extra" || exit $?
+```
+
+If `<repo>/.drydock/hooks/pre-pr.sh` exists and is executable, it runs with the payload on stdin. Non-zero exit aborts PR creation per the extension-model contract.
 
 ### 2. Gather context
 
@@ -67,7 +80,7 @@ Default to **draft** — promotion to ready-for-review is a separate user step.
 ### 5. Linkage
 
 - The `Closes <owner>/<repo>#<N>` line auto-creates the GitHub linkage.
-- If a project is configured (`github.project.id` in `config.yaml`), set the issue's Status field to `In review`.
+- If `cfg_has github.project.id`, set the issue's Status field to `In review` using `cfg_get github.project_fields.status.options.in_review`.
 - Skip the project step silently if no project is configured.
 
 ### 6. Suggest review
@@ -90,4 +103,5 @@ Draft PR opened: <url>
 - If the branch is ahead of remote, offer to push first; do not push silently.
 - If `tasks.md` has unchecked items, refuse to open a PR.
 - Never force-push during PR prep.
-- No GitHub Project hardcoding — only set Status if `config.yaml` declares a project.
+- No GitHub Project hardcoding — only set Status if `cfg_has github.project.id` returns true.
+- The `pre-pr` hook is the user's authority to refuse a PR (e.g. content-leak guard); never bypass it.

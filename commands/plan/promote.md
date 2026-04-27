@@ -4,7 +4,7 @@ argument-hint: "<issue-ref>"
 allowed-tools: Bash, Read, SlashCommand
 ---
 
-Take a triaged backlog issue and create an OpenSpec change in the target repo. By default the target is the current repo; if `config.yaml` declares an `area_to_repo` mapping, the issue's Area field can route the change to a different repo.
+Take a triaged backlog issue and create an OpenSpec change in the target repo. Load merged Drydock config (`source "${CLAUDE_PLUGIN_ROOT}/lib/config.sh"; dd_config_load`). By default the target is the current repo; if any layer declares an `area_to_repo` mapping (`cfg_keys_of area_to_repo`), the issue's Area field can route the change to a different repo.
 
 ## Procedure
 
@@ -15,21 +15,21 @@ Take a triaged backlog issue and create an OpenSpec change in the target repo. B
 ### 2. Preflight
 
 Reject and ask the user to run `/dd:plan:triage` first if any of the following:
-- The configured triage label is still present (`config.github.triage_label`, default `status/needs-triage`).
+- The configured triage label is still present (`cfg_get github.triage_label`, default `status/needs-triage`).
 - A configured project's required fields (Area, Priority, Phase) are unset.
 - The issue is labelled `type/epic` — epics stay where they are; their sub-issues get promoted.
 
 ### 3. Resolve target repo
 
-If `config.yaml` declares `area_to_repo` AND the issue has an Area value:
+If `cfg_keys_of area_to_repo` returns one or more keys AND the issue has an Area value:
 
-- Look up `area_to_repo[<area>]`. If present, that's the target repo path (resolved relative to current repo's parent, or absolute).
-- If the Area is set but has **no entry** in `area_to_repo` → fail loudly:
+- Look up `cfg_get area_to_repo.<area>`. If non-empty, that's the target repo path (resolved relative to current repo's parent, or absolute).
+- If the Area is set but `cfg_get area_to_repo.<area>` returns empty → fail loudly:
   - Print the missing mapping.
-  - Offer to add `<area>: <path>` to `config.yaml`.
+  - Offer to add `<area>: <path>` to `<repo>/.drydock/config.yaml`.
   - Refuse to promote until the mapping is supplied (or the user explicitly chooses the current repo).
 
-If `area_to_repo` is not configured: target is the current repo (no implicit routing).
+If `cfg_keys_of area_to_repo` returns nothing: target is the current repo (no implicit routing).
 
 ### 4. Navigate
 

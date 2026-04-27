@@ -1,12 +1,22 @@
-# Drydock plugin — example configuration
+# Drydock plugin — GLOBAL DEFAULTS template.
 #
-# Copy this file to `config.yaml` (same directory) and adjust values.
-# Every key is optional: when `config.yaml` is absent, commands fall back to
-# the built-in defaults listed in each comment below.
+# This file is the LOWEST-precedence layer in Drydock's three-layer config
+# merge: it ships with the plugin and provides universal defaults. Per-project
+# values live in <repo>/.drydock/config.yaml (highest precedence); per-user
+# cross-repo overrides live in ~/.drydock/config.yaml.
 #
-# Discovery: commands resolve config via ${CLAUDE_PLUGIN_ROOT}/config.yaml.
+# For per-project configuration, see templates/extension/config.yaml and
+# docs/extension-model.md — those are the right starting point. This file
+# is rarely the right place to put real values.
+#
+# Layer precedence (later wins, leaf-key level):
+#   1. ${CLAUDE_PLUGIN_ROOT}/config.yaml   ← THIS FILE (plugin defaults)
+#   2. ~/.drydock/config.yaml              ← user-level (optional)
+#   3. <repo>/.drydock/config.yaml         ← per-repo (wins)
+#
+# Maps merge key-by-key; lists replace wholesale.
 
-version: "0.1.0"
+version: "0.2.0"
 
 # ---------------------------------------------------------------------------
 # GitHub integration

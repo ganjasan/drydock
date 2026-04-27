@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+# pre-release lifecycle hook — fires before /dd:ship:release runs gates / tags.
+#
+# Drydock invokes this script if it exists and is executable at
+# <repo>/.drydock/hooks/pre-release.sh.
+#
+# Stdin payload (JSON):
+#   {
+#     "event":           "pre-release",
+#     "repo_path":       "/abs/path/to/repo",
+#     "config_path":     "/tmp/.../merged-config.json",
+#     "bump":            "minor",
+#     "current_version": "1.4.7"
+#   }
+#
+# Exit semantics: non-zero ABORTS the release before any gate runs, before
+# any version bump, tag, or push. Use this for organization-wide preconditions:
+# "no Friday releases", "must have GPG key configured", "unfinished CHANGELOG
+# section", etc.
+#
+# To enable: copy to <repo>/.drydock/hooks/pre-release.sh and chmod +x.
+
+set -euo pipefail
+
+payload="$(cat)"
+bump="$(jq -r '.bump'                       <<<"$payload")"
+current_version="$(jq -r '.current_version' <<<"$payload")"
+
+# Example: require that CHANGELOG.md was edited since the last tag.
+last_tag="$(git -C "$(jq -r '.repo_path' <<<"$payload")" describe --abbrev=0 --tags 2>/dev/null || true)"
+if [ -n "$last_tag" ]; then
+  changed_since_tag="$(git -C "$(jq -r '.repo_path' <<<"$payload")" diff --name-only "${last_tag}..HEAD" -- CHANGELOG.md)"
+  if [ -z "$changed_since_tag" ]; then
+    echo "pre-release: CHANGELOG.md has no entries since ${last_tag}; refusing ${bump} bump from ${current_version}" >&2
+    exit 1
+  fi
+fi
+
+exit 0

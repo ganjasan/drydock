@@ -1,5 +1,5 @@
 {
-  "name": "drydock",
+  "name": "dd",
   "displayName": "Drydock",
   "version": "0.1.0",
   "description": "A disciplined, AI-first development loop for Claude Code: requirements → build → ship.",
@@ -7,14 +7,8 @@
     "name": "Artem Konuchov"
   },
   "license": "MIT",
-  "commands": "./commands",
-  "agents": "./agents",
-  "skills": "./skills",
   "homepage": "https://github.com/ganjasan/drydock",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/ganjasan/drydock.git"
-  },
+  "repository": "https://github.com/ganjasan/drydock.git",
   "keywords": [
     "claude-code",
     "claude-code-plugin",

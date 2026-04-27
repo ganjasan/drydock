@@ -7,7 +7,7 @@ Report a concise status of where the user is in the Drydock workflow, using only
 
 ## Procedure
 
-If `${CLAUDE_PLUGIN_ROOT}/config.yaml` exists, read it for the GitHub Project reference. If absent, all project-related sections are skipped silently.
+Load merged Drydock configuration via `source "${CLAUDE_PLUGIN_ROOT}/lib/config.sh"; dd_config_load`. The loader merges three layers in order (later wins): plugin-root defaults → `~/.drydock/config.yaml` (optional) → `<repo>/.drydock/config.yaml`. Read keys via `cfg_get <dotted.key>`, `cfg_has <dotted.key>`, `cfg_array_get <dotted.key>`, or `cfg_keys_of <dotted.key>`. If no config layer declares a GitHub Project, all project-related sections are skipped silently.
 
 Collect and print, in this order:
 
@@ -26,12 +26,12 @@ Collect and print, in this order:
 
 ### 3. Project snapshot (only if configured)
 
-If `config.yaml` declares `github.project`:
+If `cfg_has github.project.number` returns true:
 
-- Run `gh project item-list <number> --owner <org> --format json` and count items by Status field.
+- Use `cfg_get github.project.number` and `cfg_get github.org` (or derive org from `gh repo view`) to call `gh project item-list <number> --owner <org> --format json` and count items by Status field.
 - If the call rate-limits or fails, print "— skipped (rate limit or missing project scope)".
 
-If `github.project` is not configured, omit this section entirely.
+If `github.project` is not configured in any layer, omit this section entirely.
 
 ## Output format
 

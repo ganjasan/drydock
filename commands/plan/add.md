@@ -8,7 +8,7 @@ Create a GitHub issue and (optionally) add it to a configured GitHub Project. Wo
 
 ## Procedure
 
-Read `${CLAUDE_PLUGIN_ROOT}/config.yaml` for `github.project`, `github.project_fields`, `github.triage_label`, and any custom label sets. If no `config.yaml`, use built-in defaults.
+Load merged Drydock config (`source "${CLAUDE_PLUGIN_ROOT}/lib/config.sh"; dd_config_load`). Read `github.project` (presence via `cfg_has github.project.number`), `github.project_fields.*`, `github.triage_label`, and any custom label sets. The merged config draws from plugin-root → `~/.drydock/config.yaml` → `<repo>/.drydock/config.yaml`.
 
 ### 1. Parse arguments
 
@@ -45,9 +45,9 @@ Apply `<config.github.triage_label>` (default `status/needs-triage`) if any requ
 
 ### 5. Project board (only if configured)
 
-If `config.yaml` declares `github.project.id`:
+If `cfg_has github.project.id`:
 - The Action `add-to-project` may pick the issue up automatically.
-- Set explicit project fields via `gh project item-edit` using the field IDs from `github.project_fields.*`.
+- Set explicit project fields via `gh project item-edit` using the field IDs from `cfg_get github.project_fields.<field>.id` (e.g. `status`, `priority`, `area`, `phase`).
 
 If no project is configured: skip — the issue lives at the repo level only.
 
@@ -69,6 +69,6 @@ Created <owner>/<repo>#<N>
 
 ## Guardrails
 
-- Never invent a project number. If `config.yaml` does not declare a project, do not call `gh project`.
+- Never invent a project number. If `cfg_has github.project.number` returns false, do not call `gh project`.
 - Never apply project field values that are not in the configured options table.
 - Triage label is configurable; default is `status/needs-triage`.

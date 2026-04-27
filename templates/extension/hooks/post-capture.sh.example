@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+# post-capture lifecycle hook — fires after a raw signal lands in the inbox
+# (via /dd:raw:capture or any /dd:raw:ingest-* command, once add-raw-phase
+# is applied).
+#
+# Drydock invokes this script per-item: it fires once per filed item, not
+# once per ingest run. A bulk ingest of 12 items fires the hook 12 times.
+#
+# Drydock invokes this script if it exists and is executable at
+# <repo>/.drydock/hooks/post-capture.sh.
+#
+# Stdin payload (JSON):
+#   {
+#     "event":       "post-capture",
+#     "repo_path":   "/abs/path/to/repo",
+#     "config_path": "/tmp/.../merged-config.json",
+#     "item_path":   "raw/_incoming/2026-04-27-meeting-with-x.md",
+#     "source":      "manual" | "gmail" | "calendar" | "drive" | "notion" | "linear" | "github"
+#   }
+#
+# Exit semantics: non-zero is a WARNING — does NOT prevent the item from
+# remaining in the inbox. Use for frontmatter validation, label enrichment,
+# cross-link suggestions, etc. Failures should not interrupt ingestion.
+#
+# To enable: copy to <repo>/.drydock/hooks/post-capture.sh and chmod +x.
+
+set -uo pipefail
+
+payload="$(cat)"
+item_path="$(jq -r '.item_path' <<<"$payload")"
+repo_path="$(jq -r '.repo_path' <<<"$payload")"
+
+# Example: warn if the captured item has no `dedup_key` frontmatter
+# (which would normally be set by the capture/ingest command, but a custom
+# source might forget).
+if ! grep -q '^dedup_key:' "${repo_path}/${item_path}" 2>/dev/null; then
+  echo "post-capture: ${item_path} is missing dedup_key frontmatter" >&2
+  exit 1
+fi
+
+exit 0

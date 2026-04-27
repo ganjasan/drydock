@@ -1,0 +1,191 @@
+# Drydock — per-repo configuration overlay template.
+#
+# Copy to <repo>/.drydock/config.yaml and adjust. Every key is OPTIONAL —
+# the merged loader (plugin defaults → ~/.drydock/config.yaml → <repo>/.drydock/config.yaml)
+# falls back to documented defaults when a key is absent.
+#
+# This file is the project-local layer (highest precedence). For a single
+# developer's cross-repo personal preferences, use ~/.drydock/config.yaml.
+#
+# Schema reference: docs/extension-model.md.
+
+# ---------------------------------------------------------------------------
+# Filesystem paths (all relative to <repo-root> unless absolute)
+# ---------------------------------------------------------------------------
+paths:
+  # Root for Wiegers requirements artifacts. Default: requirements
+  # requirements: requirements
+
+  # Subdirectory names under paths.requirements.
+  # requirements_subdirs:
+  #   vision:        vision
+  #   stakeholders:  stakeholders
+  #   use_cases:     use-cases
+  #   adr:           adr
+
+  # OpenSpec layout (matches the openspec CLI conventions by default).
+  # openspec:
+  #   changes: openspec/changes
+  #   specs:   openspec/specs
+
+  # Raw inbox root. Default: raw
+  # raw_root: raw
+
+  # Raw inbox subdirectory names. Defaults match Drydock conventions.
+  # raw_subdirs:
+  #   incoming:       _incoming
+  #   meetings:       meetings
+  #   feedback:       feedback
+  #   ideas:          ideas
+  #   competitors:    competitors
+  #   client_boards:  client-boards
+
+# ---------------------------------------------------------------------------
+# GitHub integration (used by /dd:plan:*, /dd:ship:pr, /dd:ship:release)
+# ---------------------------------------------------------------------------
+github:
+  # GitHub org or user. Default: derived from `gh repo view` of current repo.
+  # org: your-org-or-user
+
+  # Optional GitHub Projects v2 reference. Without this block, plan commands
+  # operate on issues only and skip project-board assignment.
+  # project:
+  #   number: 1
+  #   id:     PVT_xxxxxxxx
+  #   name:   Backlog
+  #   url:    https://github.com/orgs/your-org/projects/1
+
+  # Optional Project field IDs and option maps. Without these, plan commands
+  # skip the field set silently.
+  # project_fields:
+  #   status:
+  #     id: PVTSSF_xxxx
+  #     options:
+  #       backlog:     abcd1234
+  #       ready:       abcd1235
+  #       in_progress: abcd1236
+  #       in_review:   abcd1237
+  #       done:        abcd1238
+  #   priority:
+  #     id: PVTSSF_yyyy
+  #     options:
+  #       p0: ...
+  #       p1: ...
+  #       p2: ...
+  #       p3: ...
+  #   area:
+  #     id: PVTSSF_zzzz
+  #     options:
+  #       backend:  ...
+  #       frontend: ...
+  #       infra:    ...
+  #   phase:
+  #     id: PVTSSF_aaaa
+  #     options:
+  #       phase_1: ...
+  #       phase_2: ...
+
+  # Label applied to issues that still need triage. Default: status/needs-triage
+  # triage_label: status/needs-triage
+
+  # Optional: additional repos that /dd:plan:triage should scan. Each entry
+  # is an "<owner>/<repo>" slug. Current repo is always included.
+  # triage_repos:
+  #   - your-org/repo-a
+  #   - your-org/repo-b
+
+  # When true, /dd:req:adr offers to create a discussion issue. Default: false
+  # adr_creates_issue: false
+
+# ---------------------------------------------------------------------------
+# Worktree convention (used by /dd:build:start)
+# ---------------------------------------------------------------------------
+worktree:
+  # Whether /dd:build:start creates a git worktree. Default: false
+  # When false, the command creates a branch in the current working tree.
+  # enabled: false
+
+  # Where worktrees live. Default: .worktrees (relative to repo root)
+  # base_dir: .worktrees
+
+  # Worktree directory naming. Tokens: <issue-id>, <slug>. Default: wt-<issue-id>
+  # naming: wt-<issue-id>
+
+  # Branch naming. Tokens: <issue-id>, <slug>. Default: feature/<issue-id>-<slug>
+  # branch_naming: feature/<issue-id>-<slug>
+
+# ---------------------------------------------------------------------------
+# Area → repository routing (used by /dd:plan:promote, /dd:build:start)
+# ---------------------------------------------------------------------------
+# Maps an Area label/field value on a GitHub issue to a target repo path.
+# Path values: "." for current repo, absolute paths, or relative paths
+# resolved against the parent of the current repo.
+# area_to_repo:
+#   frontend: ../my-org-frontend
+#   backend:  ../my-org-backend
+#   docs:     .
+#   shared:   /opt/shared-repo
+
+# ---------------------------------------------------------------------------
+# Release pipeline (used by /dd:ship:release)
+# ---------------------------------------------------------------------------
+# release:
+#   # When true, /dd:ship:release defaults to dry-run unless --apply is passed.
+#   # dry_run_default: false
+#
+#   # Pre-flight check: any open issues with these labels abort the release.
+#   # block_on_labels:
+#   #   - priority/P0
+#   #   - priority/P1
+#
+#   # Slash-command references invoked as gates before tagging. Both built-in
+#   # /dd:* and project-local <repo>/.claude/commands/* are addressable.
+#   # Each gate must exit 0 or the release aborts.
+#   # gates:
+#   #   - /dd:build:test
+#   #   - /conformance        # project-local at <repo>/.claude/commands/conformance.md
+#   #   - /parity             # project-local
+#
+#   # Optional multi-repo coordination. Two or more entries trigger the
+#   # release-coordinator agent which computes topological order from depends_on.
+#   # Single-entry or absent → single-repo flow (no agent).
+#   # repos:
+#   #   - name:       protocol
+#   #     path:       ../my-protocol
+#   #     depends_on: []
+#   #   - name:       platform
+#   #     path:       ../my-platform
+#   #     depends_on: [protocol]
+
+# ---------------------------------------------------------------------------
+# Raw ingestion sources (used by /dd:raw:* commands — added in v0.2 by
+# the add-raw-phase change. Listed here as a placeholder so the schema is
+# discoverable; populate per-source after add-raw-phase is applied.)
+# ---------------------------------------------------------------------------
+# raw:
+#   gmail:
+#     query: "is:unread"
+#     labels_to_track: []
+#     since_days: 7
+#   calendar:
+#     calendar_ids: []
+#     look_back_days: 7
+#     look_ahead_days: 14
+#   drive:
+#     folder_ids: []
+#     file_types: [video/mp4, audio/m4a]
+#     since_days: 7
+#   notion:
+#     databases: []   # list of {id, label}
+#   linear:
+#     teams: []
+#     filter: ""
+#   github:
+#     repos: []       # external repos you collaborate on
+#     since_days: 7
+#   transcribe:
+#     provider: ""
+#     model: ""
+#   classifier:
+#     # Custom category set; defaults to the five canonical Drydock categories.
+#     categories: []   # list of {name, description}

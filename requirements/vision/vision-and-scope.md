@@ -1,8 +1,8 @@
 ---
 title: "Drydock Vision and Scope"
-version: "0.1.0"
+version: "0.2.0"
 created: 2026-04-24
-updated: 2026-04-24
+updated: 2026-04-27
 status: draft
 ---
 
@@ -19,6 +19,7 @@ status: draft
 | Версия | Дата       | Автор          | Описание изменений                                                    |
 |--------|------------|----------------|-----------------------------------------------------------------------|
 | 0.1.0  | 24.04.2026 | Artem Konuchov | Первоначальная версия — выделение универсального ядра из APZ-плагина |
+| 0.2.0  | 27.04.2026 | Artem Konuchov | Расширение workflow до пяти фаз (`raw → req → plan → build → ship`); полная ликвидация APZ; добавлены extension model и план четырёх OpenSpec changes (см. ADR-0004) |
 
 ---
 
@@ -61,6 +62,7 @@ Drydock — самостоятельный, универсальный Claude Co
 | BO-3 | Репозиторий сам следует своей методологии (dogfooding)                                                     | Все изменения после v0.1 идут через OpenSpec-changes; все фичи имеют трассировку в ADR/Vision; 100 % требований в `requirements/` | Релиз v0.1 и далее |
 | BO-4 | Drydock становится рабочей зависимостью FASTSAAS                                                        | FASTSAAS успешно использует Drydock как CORE-модуль (FE-CORE-11 в FASTSAAS VnS); команды работают в FASTSAAS-проекте | +1 мес от v0.1|
 | BO-5 | Достичь органической видимости среди Claude Code community                                                 | ≥ 100 GitHub stars и ≥ 5 внешних проектов, использующих плагин                                                          | +6 мес от v0.1|
+| BO-6 | Drydock покрывает полный жизненный цикл от внешнего сигнала до релиза в любом проекте автора без модификации кода плагина | Все четыре v0.2-change'а (`drydock-extension-model`, `add-raw-phase`, `config-driven-paths-and-gates`, `retire-apz`) реализованы и заархивированы; APZ-плагин удалён; Apilize-репозитории работают только через `<repo>/.drydock/` overlay; FASTSAAS использует тот же extension model | Релиз v0.2 |
 
 > *Assumption: BO-5 предполагает публичный репозиторий под MIT. Если плагин остаётся личным — цель снимается.*
 
@@ -71,12 +73,14 @@ Drydock — самостоятельный, универсальный Claude Co
 3. **«Я хочу переиспользовать методологию между проектами».** Копировать руками — больно и расходится; нужен плагин, который можно подключить.
 4. **«Apilize-специфика мешает открыть инструменты наружу».** Внутренняя терминология и пути делают плагин непригодным для чужих проектов.
 5. **«AI-ассистированная разработка часто превращается в хаос».** Нужна дисциплина, которая не тормозит Claude Code, а наоборот — даёт ему опору.
+6. **«Сигналы из внешних источников теряются между инструментами».** Письма, встречи, заметки в Notion, заявки в Linear — без структурированного приёма они не превращаются в требования. Нужен левый край петли — фаза `raw`, обрабатывающая входящие сигналы единообразно.
+7. **«Каждый проект имеет свою специфику, но не должен форкать плагин».** Apilize Protocol-conformance, public-ready-guard, Gmail-фильтры под клиентов — это всё локальная специфика, которая должна жить в репо проекта, а не в коде плагина.
 
 ### 1.5 Business Risks
 
 | ID   | Описание риска                                                                                                                       | Вероятность | Влияние | Стратегия                                                                                                   |
 |------|--------------------------------------------------------------------------------------------------------------------------------------|-------------|---------|-------------------------------------------------------------------------------------------------------------|
-| BR-1 | Разрыв с APZ: расхождение двух плагинов приводит к двойной поддержке                                                                 | В           | В       | После v0.1 APZ становится тонкой обёрткой над Drydock с Apilize-специфичными дополнениями; миграция     |
+| BR-1 | Двойная поддержка APZ и Drydock                                                                                                      | Н (после v0.2) | В    | В v0.2 APZ полностью ликвидируется (см. ADR-0004); Apilize-специфика мигрирует в `apilize-hub/.drydock/` через extension model. После завершения change'а `retire-apz` риск снимается полностью. |
 | BR-2 | Эволюция Claude Code API (plugins, skills, agents) ломает плагин                                                                     | С           | В       | Минимизировать использование нестабильных API; CI-прогон на актуальной версии раз в неделю                |
 | BR-3 | OpenSpec как основа build-loop меняет формат артефактов                                                                              | С           | С       | Изолировать OpenSpec-интеграцию в отдельный модуль; держать версию в зависимостях                         |
 | BR-4 | Методология воспринимается как «слишком тяжёлая» для простых задач                                                                   | С           | С       | Ввести режимы: `/dd:build:ff` (fast-forward для тривиальных задач); документировать когда не использовать |
@@ -89,9 +93,9 @@ Drydock — самостоятельный, универсальный Claude Co
 ### 2.1 Vision Statement
 
 **FOR** автора и других solo-developer'ов, работающих с Claude Code как основным инструментом
-**WHO** хотят превратить «vibe coding» в дисциплинированный, повторяемый процесс с полной трассируемостью от требования до релиза
+**WHO** хотят превратить «vibe coding» в дисциплинированный, повторяемый процесс с полной трассируемостью от внешнего сигнала до релиза
 **THE** Drydock **IS A** универсальный Claude Code плагин и методология
-**THAT** даёт готовый цикл «Требование → Проект изменения → Код → Тесты → PR → Релиз» с командами `/dd:req:*`, `/dd:build:*`, `/dd:ship:*` и библиотекой скиллов, шаблонов и sub-агентов
+**THAT** даёт готовый пятифазный цикл «Сигнал → Требование → План → Проект изменения → Код → Тесты → PR → Релиз» с командами `/dd:raw:*`, `/dd:req:*`, `/dd:plan:*`, `/dd:build:*`, `/dd:ship:*`, библиотекой скиллов/шаблонов/sub-агентов и тремя точками расширения внутри потребляющего репо (`<repo>/.drydock/config.yaml`, `<repo>/.drydock/hooks/`, `<repo>/.claude/commands/`)
 **UNLIKE** ad-hoc промптов, внутренних плагинов, привязанных к конкретной компании (как APZ к Apilize), или тяжёлых корпоративных ALM-инструментов (Jira / Azure DevOps)
 **OUR PRODUCT** лёгкий, opensource, domain-agnostic, интегрирован с Wiegers и OpenSpec, и применяется к своей же разработке (dogfooding).
 
@@ -111,6 +115,9 @@ Drydock — самостоятельный, универсальный Claude Co
 | FE-10   | Dogfood requirements                | Собственные `requirements/` и `openspec/` этого репозитория                                                               | BO-3         |
 | FE-11   | Migration guide APZ → Drydock   | `docs/migration-from-apz.md`: команды, пути, что менять при переходе                                                      | BO-1         |
 | FE-12   | Installation & bootstrap            | `README`, `CLAUDE.md` и `.claude/` установочный скрипт, позволяющий подключить плагин в любой проект одной командой     | BO-2, BO-4   |
+| FE-13   | Command suite `/dd:raw:*`          | Универсальный приём внешних сигналов: `capture`, `process`, `ingest-{gmail,calendar,drive,notion,linear,github}`, `transcribe`. Конвенция каталога `raw/_incoming/`, `raw/meetings/`, `raw/feedback/`, `raw/ideas/`, `raw/competitors/`. Источники и фильтры — через config | BO-1, BO-2, BO-4 |
+| FE-14   | Extension model                    | Три точки расширения в потребляющем репо: декларативный `<repo>/.drydock/config.yaml`, императивные `<repo>/.drydock/hooks/`, и project-local `<repo>/.claude/commands/`. Документировано в `docs/extension-model.md` | BO-1, BO-2, BO-4 |
+| FE-15   | Configurable release pipeline      | `release.gates` (список slash-команд, обязательных перед релизом), `area_to_repo` для multi-repo routing, multi-repo coordination через `release.repos` — всё declarative из config | BO-2, BO-4   |
 
 ### 2.3 Assumptions and Dependencies
 
@@ -143,22 +150,29 @@ Drydock — самостоятельный, универсальный Claude Co
 - **FE-11** — migration guide.
 - **FE-12** — README, CLAUDE.md, установка.
 
-**FE-9 (GitHub Projects opt)** — в v0.1 включена только как «проверено, что не ломается без Apilize Project #2»; полноценная универсальная Projects-интеграция — v0.2.
+**FE-9 (GitHub Projects opt)** — в v0.1 включена только как «проверено, что не ломается без Apilize Project #2»; полноценная универсальная Projects-интеграция перенесена в v0.3 (v0.2 фокусируется на pentaphase workflow и extension model — см. Section 3.2).
 
 **Ожидаемая дата релиза:** *TBD.*
 
 ### 3.2 Scope of Subsequent Releases
 
-**v0.2 (ожидается +1–2 мес):**
+**v0.2 — Пятифазный workflow и проектные расширения** (зафиксировано в [ADR-0004](../adr/0004-universal-workflow-and-project-extensions.md), ожидается +1–2 мес):
 
-- Универсальная GitHub Projects integration (FE-9 full).
-- Конфиг-слой: per-project `.drydock/config.yaml` для override умолчаний.
-- Расширенные `/dd:build:*` сценарии (ff-режим, parallel-changes).
+Реализуется через четыре OpenSpec-change'а в указанном порядке:
+
+1. **`drydock-extension-model`** — схема `<repo>/.drydock/config.yaml`, lifecycle hook-точки (`pre-pr`, `pre-release`, `post-capture`, …), контракт command-references из config (FE-14, FE-15); `docs/extension-model.md`.
+2. **`add-raw-phase`** — поднять `/apz:raw:*` в `/dd:raw:*` (FE-13); перенос `raw-classifier` agent в drydock; обобщение Apilize-дефолтов в config-ключи.
+3. **`config-driven-paths-and-gates`** — `release.gates`, `area_to_repo`, multi-repo coordination через config (FE-15); удаление оставшихся хардкодов путей в командах.
+4. **`retire-apz`** *(в репо `apilize-hub`, не в drydock)* — удаление `apilize-hub/plugins/apz/`; создание `apilize-hub/.drydock/` overlay (config + hooks); перевод `conformance`/`parity` в `<repo>/.claude/commands/` соответствующих репо; полное переписывание `migration-from-apz.md` без секции «Stays in APZ».
+
+Универсальная GitHub Projects integration (FE-9 full) переносится в v0.3.
 
 **v0.3:**
 
+- Универсальная GitHub Projects integration (FE-9 full) — поля Status / Priority / Phase / Area, project-board snapshot в `/dd:status` и `/dd:next`.
 - Альтернативные back-end'ы для trackers: Linear, Notion (опционально, через adapter).
 - Visual status dashboard (static HTML/Markdown-генерация из требований).
+- Расширенные `/dd:build:*` сценарии (parallel-changes, semi-automated change merges).
 
 **v1.0 (ожидается +6 мес):**
 
@@ -170,7 +184,7 @@ Drydock — самостоятельный, универсальный Claude Co
 
 Следующее **НЕ входит** в scope Drydock:
 
-1. **Apilize-специфика** — ссылки на apilize-hub, клиентские проекты, внутренние структуры. Всё это остаётся в APZ как тонкой обёртке.
+1. **Apilize-специфика и любая другая проектная специфика в коде плагина** — ссылки на apilize-hub, клиентские проекты, внутренние структуры, конкретные test-runner'ы (conformance/parity), guard-скрипты. Это всё переезжает в `<repo>/.drydock/` и `<repo>/.claude/commands/` потребляющих репо через extension model (FE-14). После v0.2 в коде самого плагина не должно остаться ни одного упоминания Apilize или клиентских доменов.
 2. **Домен-специфичный контент** — финансовое моделирование, SaaS-бизнес-логика, конкретные вертикали.
 3. **Собственный trackers-бэкенд** — Drydock не заменяет Linear, Jira, GitHub Projects; он их использует.
 4. **IDE-интеграции помимо Claude Code** — Cursor, Windsurf, continue.dev — вне scope v0.x.
@@ -236,9 +250,11 @@ Drydock — Claude Code plugin. Установка: `claude plugin install <repo
 
 | Термин               | Определение                                                                                                                            |
 |----------------------|----------------------------------------------------------------------------------------------------------------------------------------|
-| Drydock           | Claude Code plugin и методология разработки Req → Build → Ship.                                                                        |
-| APZ                  | Внутренний Apilize-Claude Code плагин, исторический предок Drydock. После v0.1 становится тонкой обёрткой над Drydock.          |
-| Req → Build → Ship   | Три фазы workflow: requirements → implementation loop → release.                                                                       |
+| Drydock              | Claude Code plugin и методология разработки `Raw → Req → Plan → Build → Ship` (пятифазный workflow с v0.2).                            |
+| APZ                  | Внутренний Apilize-Claude Code плагин, исторический предок Drydock. После v0.2 (см. ADR-0004) **полностью ликвидируется** — Apilize-специфика переезжает в `apilize-hub/.drydock/` и `<repo>/.claude/commands/`. |
+| Raw → Req → Plan → Build → Ship | Пять фаз универсального workflow drydock с v0.2: приём внешних сигналов → требования → планирование → implementation loop → релиз. До v0.2 укороченная форма «Req → Build → Ship» использовалась для трёх правых фаз. |
+| Pentaphase workflow  | Синоним «Raw → Req → Plan → Build → Ship». Используется в ADR-0004 и далее.                                                            |
+| Extension model      | Три точки расширения drydock внутри потребляющего репо: декларативный `<repo>/.drydock/config.yaml`, императивные `<repo>/.drydock/hooks/`, и project-local `<repo>/.claude/commands/`. Зафиксировано в ADR-0004. |
 | OpenSpec             | Формат/инструмент для описания изменений кодовой базы как артефактов (changes, deltas, specs).                                         |
 | ADR                  | Architectural Decision Record — формат решения с контекстом, вариантами и последствиями.                                               |
 | Dogfooding           | Использование собственного продукта для собственной разработки. Drydock разрабатывается с использованием Drydock.                |
@@ -248,12 +264,15 @@ Drydock — Claude Code plugin. Установка: `claude plugin install <repo
 
 | Документ                                             | Расположение                                                              |
 |------------------------------------------------------|---------------------------------------------------------------------------|
-| ADR-0001: Name (Drydock)                          | `requirements/adr/0001-name-drydock.md`                                |
+| ADR-0001: Name (Drydock)                             | `requirements/adr/0001-name-drydock.md`                                |
 | ADR-0002: Dogfooding as a principle                  | `requirements/adr/0002-dogfooding-as-principle.md`                        |
+| ADR-0003: Raw/conformance/parity stay in APZ (superseded) | `requirements/adr/0003-raw-conformance-parity-stay-in-apz.md`        |
+| ADR-0004: Universal workflow and project-local extensions | `requirements/adr/0004-universal-workflow-and-project-extensions.md` |
 | Methodology overview                                 | `docs/methodology.md`                                                     |
-| Workflow (Req → Build → Ship)                        | `docs/workflow.md`                                                        |
+| Workflow (Raw → Req → Plan → Build → Ship)           | `docs/workflow.md`                                                        |
 | Skills catalog                                       | `docs/skills-catalog.md`                                                  |
-| Migration guide APZ → Drydock                     | `docs/migration-from-apz.md` *(планируется к v0.1)*                       |
+| Extension model                                      | `docs/extension-model.md` *(планируется к v0.2)*                          |
+| Migration guide APZ → Drydock                        | `docs/migration-from-apz.md` *(будет переписан в рамках `retire-apz`)*    |
 | FASTSAAS Vision and Scope (консумер)                 | `../fastsaas/requirements/vision/vision-and-scope.md`                     |
 
 ---
