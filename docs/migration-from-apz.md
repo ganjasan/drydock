@@ -2,8 +2,6 @@
 
 If you are coming from the internal Apilize APZ plugin, this guide maps the familiar commands and paths to their Drydock equivalents.
 
-> **Status:** this document is a roadmap for v0.1 — it will be finalized when the actual command port happens. Paths below reflect the planned structure.
-
 ## Command mapping
 
 | APZ command                | Drydock command              | Notes                                                         |

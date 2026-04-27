@@ -1,7 +1,7 @@
 {
   "name": "drydock",
   "displayName": "Drydock",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "A disciplined, AI-first development loop for Claude Code: requirements → build → ship.",
   "author": {
     "name": "Artem Konuchov"

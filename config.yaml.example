@@ -1,0 +1,134 @@
+# Drydock plugin — example configuration
+#
+# Copy this file to `config.yaml` (same directory) and adjust values.
+# Every key is optional: when `config.yaml` is absent, commands fall back to
+# the built-in defaults listed in each comment below.
+#
+# Discovery: commands resolve config via ${CLAUDE_PLUGIN_ROOT}/config.yaml.
+
+version: "0.1.0"
+
+# ---------------------------------------------------------------------------
+# GitHub integration
+# Used by /dd:plan:add, /dd:plan:triage, /dd:plan:promote, /dd:ship:pr.
+# ---------------------------------------------------------------------------
+github:
+  # GitHub org or user. Default: derive from `gh repo view` of the current repo.
+  # org: "your-org-or-user"
+
+  # Optional GitHub Projects v2 reference. When omitted, plan commands operate
+  # on issues only, without project-board assignment.
+  # project:
+  #   number: 1                  # Project number visible in the URL
+  #   id: "PVT_xxxxxxxx"         # Project node ID (from `gh project view --format json`)
+  #   name: "Backlog"            # Display name used in /dd:next output
+  #   url: "https://github.com/orgs/your-org/projects/1"
+
+  # Optional Project field IDs (from `gh project field-list`). Required only if
+  # plan commands should set custom fields like Status / Priority / Phase / Area.
+  # project_fields:
+  #   status:
+  #     id: "PVTSSF_xxxx"
+  #     options:
+  #       backlog: "abcd1234"
+  #       ready: "abcd1235"
+  #       in_progress: "abcd1236"
+  #       in_review: "abcd1237"
+  #       done: "abcd1238"
+  #   priority:
+  #     id: "PVTSSF_yyyy"
+  #     options:
+  #       p0: "..."
+  #       p1: "..."
+  #       p2: "..."
+  #       p3: "..."
+
+  # Label name applied to issues that still need triage.
+  # Default: "status/needs-triage"
+  # triage_label: "status/needs-triage"
+
+  # Optional list of additional repositories that /dd:plan:triage should scan.
+  # Each entry is a `<owner>/<repo>` slug. The current repo is always included.
+  # triage_repos:
+  #   - "your-org/repo-a"
+  #   - "your-org/repo-b"
+
+  # Optional behavior flag: when /dd:req:adr finishes, also create a discussion
+  # issue in the current repo via `gh issue create`. Default: false.
+  # adr_creates_issue: false
+
+# ---------------------------------------------------------------------------
+# Paths
+# Where Drydock writes requirements artifacts. All relative to the repo root.
+# ---------------------------------------------------------------------------
+paths:
+  # Default: "requirements"
+  # requirements: "requirements"
+
+  # Subdirectory names under paths.requirements.
+  # Defaults shown.
+  # requirements_subdirs:
+  #   vision: "vision"
+  #   stakeholders: "stakeholders"
+  #   use_cases: "use-cases"
+  #   adr: "adr"
+
+  # OpenSpec layout. Defaults match the openspec CLI conventions.
+  # openspec:
+  #   changes: "openspec/changes"
+  #   specs: "openspec/specs"
+
+# ---------------------------------------------------------------------------
+# Worktree convention (used by /dd:build:start)
+# ---------------------------------------------------------------------------
+worktree:
+  # Whether /dd:build:start creates a git worktree. Default: false.
+  # When false, the command creates a branch in the current working tree.
+  # enabled: false
+
+  # Where worktrees live, relative to the repo root or absolute.
+  # Default: ".worktrees"
+  # base_dir: ".worktrees"
+
+  # Worktree directory naming. Tokens: <issue-id>, <slug>.
+  # Default: "wt-<issue-id>"
+  # naming: "wt-<issue-id>"
+
+  # Branch naming. Tokens: <issue-id>, <slug>.
+  # Default: "feature/<issue-id>-<slug>"
+  # branch_naming: "feature/<issue-id>-<slug>"
+
+# ---------------------------------------------------------------------------
+# Release pipeline (used by /dd:ship:release)
+# ---------------------------------------------------------------------------
+# release:
+#   # Default --dry-run on the first invocation. Default: false.
+#   # dry_run_default: true
+#
+#   # Labels whose presence on open issues blocks a release. Default: empty.
+#   # block_on_labels:
+#   #   - "priority/P0"
+#   #   - "priority/P1"
+#
+#   # Optional multi-repo declaration. When two or more repos are listed with
+#   # `depends_on`, /dd:ship:release invokes the `release-coordinator` agent
+#   # to determine release order and propagate downstream pins.
+#   # repos:
+#   #   - name: "my-protocol"
+#   #     path: "../my-protocol"
+#   #     depends_on: []
+#   #   - name: "my-platform"
+#   #     path: "../my-platform"
+#   #     depends_on: ["my-protocol"]
+
+# ---------------------------------------------------------------------------
+# Area → repository routing (optional, used by /dd:plan:promote, /dd:build:start)
+# Maps an Area label/field value on a GitHub issue to a target repo path.
+# Path is resolved relative to the parent of the current repo, or absolute.
+# When the issue's Area is set but has no entry here, /dd:plan:promote fails
+# loudly and offers to add a mapping.
+# ---------------------------------------------------------------------------
+# area_to_repo:
+#   frontend: "../my-org-frontend"
+#   backend: "../my-org-backend"
+#   docs: "."        # current repo

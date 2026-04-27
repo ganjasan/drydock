@@ -1,91 +1,90 @@
 # Skills Catalog
 
-Drydock ships (pun intended) a small, curated set of skills. Each skill is reusable across commands and can also be invoked directly.
+Drydock ships (pun intended) a small, curated set of skills. Each skill is reusable across commands and can also be invoked directly by name (`/<skill>`) without going through a `/dd:*` wrapper.
 
-Skills follow the Claude Code Skill convention: a `SKILL.md` with YAML frontmatter (`name`, `description`, triggering heuristics) and an optional `templates/` and `examples/` directory.
+Skills follow the Claude Code Skill convention: a `SKILL.md` with YAML frontmatter (`name`, `description`, optional `allowed-tools`) and the body of the skill prompt. Each lives at `skills/<name>/SKILL.md`.
 
 ## Requirements skills
 
 ### vision-and-scope
 
-Create a Wiegers-style Vision & Scope document. Invoked by `/dd:req:vision`.
+Create a Wiegers-style Vision & Scope document. Wrapped by `/dd:req:vision`. File: `skills/vision-and-scope/SKILL.md` (with `templates/` and `examples/`).
 
 ### use-case
 
-Write a Wiegers/Cockburn use case (primary actor, trigger, main success scenario, extensions, etc.). Invoked by `/dd:req:use-case`.
+Write a Wiegers/Cockburn use case (primary actor, trigger, main success scenario, extensions, etc.). Wrapped by `/dd:req:use-case`. File: `skills/use-case/SKILL.md`.
 
 ### stakeholder-profile
 
-Create detailed stakeholder profiles. Invoked by `/dd:req:stakeholder`.
+Create detailed stakeholder profiles. Wrapped by `/dd:req:stakeholder`. File: `skills/stakeholder-profile/SKILL.md`.
 
 ### requirements-elicitation
 
-Prepare an elicitation plan — stakeholders, techniques, scheduling. Invoked by `/dd:req:elicit`.
+Prepare an elicitation plan — gaps, stakeholders, techniques, schedule. Wrapped by `/dd:req:elicit`. File: `skills/requirements-elicitation/SKILL.md`.
 
 ### requirements-review
 
-Review requirements against Wiegers quality criteria (clear, complete, consistent, feasible, necessary, prioritized, testable, unambiguous). Invoked by `/dd:req:review`.
+Review requirements against the eight Wiegers quality criteria (clear, complete, consistent, feasible, necessary, prioritized, testable, unambiguous). Wrapped by `/dd:req:review`. File: `skills/requirements-review/SKILL.md`.
 
 ### adr
 
-Create an Architectural Decision Record with auto-numbering and traceability frontmatter. Invoked by `/dd:req:adr`.
+Create an Architectural Decision Record with auto-numbering and traceability frontmatter. Wrapped by `/dd:req:adr`. File: `skills/adr/SKILL.md`.
 
 ## Build skills
 
 ### openspec-new-change
 
-Create a new OpenSpec change with proposal/design/tasks skeleton. Invoked by `/dd:build:start`.
+Create a new OpenSpec change with proposal/design/tasks skeleton. Used by `/dd:build:start` and standalone. File: `skills/openspec-new-change/SKILL.md`.
 
 ### openspec-continue-change
 
-Advance a change to the next artifact. Invoked by `/dd:build:continue`.
+Advance an in-flight change to the next missing artifact. Used by `/dd:build:design`. File: `skills/openspec-continue-change/SKILL.md`.
 
 ### openspec-apply-change
 
-Work through the tasks list of an active change. Invoked by `/dd:build:code`.
+Work through the tasks list of an active change. Used by `/dd:build:code`. File: `skills/openspec-apply-change/SKILL.md`.
 
 ### openspec-ff-change
 
-Fast-forward mode — generate all change artifacts in one pass for well-understood work. Invoked by `/dd:build:ff`.
+Fast-forward — generate proposal/design/tasks/specs in one pass for well-understood work. Used by `/dd:build:ff`. File: `skills/openspec-ff-change/SKILL.md`.
 
 ### openspec-explore
 
-Q&A mode for ambiguous scope. Invoked by `/dd:build:explore`.
+Q&A mode for ambiguous scope. Used by `/dd:build:explore`. File: `skills/openspec-explore/SKILL.md`.
 
 ### openspec-verify-change
 
-Pre-archive verification: code matches the change, tasks all checked, specs deltas consistent. Invoked by `/dd:build:verify`.
+Pre-archive verification: tasks all checked, deltas consistent, design references resolve. Used by `/dd:build:verify` and indirectly by `/dd:ship:archive`. File: `skills/openspec-verify-change/SKILL.md`.
 
 ## Ship skills
 
 ### openspec-archive-change
 
-Archive a completed change after merge. Invoked by `/dd:ship:archive`.
+Archive a completed change after merge. Used by `/dd:ship:archive`. File: `skills/openspec-archive-change/SKILL.md`.
 
 ### openspec-sync-specs
 
-Sync deltas from a change into main specs. Invoked by `/dd:ship:sync` (also called by archive).
+Sync delta specs from a change into main `openspec/specs/`. Called by `/dd:ship:archive`. File: `skills/openspec-sync-specs/SKILL.md`.
 
 ### openspec-bulk-archive
 
-Archive multiple parallel completed changes in one pass. Invoked by `/dd:ship:bulk-archive`.
+Archive multiple parallel completed changes in one pass. File: `skills/openspec-bulk-archive/SKILL.md`.
 
-## Sub-agents (not skills, but related)
+## Subagents (related, but not skills)
 
-Sub-agents are autonomous helpers invoked by commands and skills — they handle focused tasks in parallel or in isolation:
+Subagents live under `agents/` and are invoked by commands and skills via the Agent tool.
 
-- **code-reviewer** — reviews diffs for bugs, security, and project conventions.
-- **code-explorer** — traces execution paths and maps architecture layers.
-- **code-architect** — designs feature architectures from codebase patterns.
-- **traces-linter** — verifies `traces_to` frontmatter references are bidirectional.
-- **release-coordinator** — orchestrates multi-repo releases.
-- **raw-classifier** — classifies raw client/signal artifacts into categories.
+- **code-reviewer** — reviews diffs against the active OpenSpec change's tasks and specs (Drydock-flavored — distinct from Claude Code's built-in code-reviewer).
+- **code-explorer** — traces execution paths AND surfaces traceability artifacts (ADRs, use cases, vision sections).
+- **code-architect** — produces designs in the shape of an OpenSpec `design.md` section.
+- **traces-linter** — verifies bidirectional `traces_to` frontmatter references.
+- **release-coordinator** — orchestrates multi-repo releases (only invoked when `config.yaml` declares dependent repos).
 
-See `agents/` for the full list and individual descriptions.
+`raw-classifier` is **not** shipped — it remains in APZ.
 
 ## Conventions
 
 - Skill directories are kebab-case under `skills/`.
-- Each skill has a `SKILL.md` with `name`, `description`, `allowed-tools` (if restrictive), and the body of the skill prompt.
-- Templates live in `skill-name/templates/`, examples in `skill-name/examples/`.
-- Skills should be **invokable standalone** (without a command wrapper) — command files are thin wrappers that pass arguments and handle placement conventions.
+- Each skill has a `SKILL.md` with `name`, `description`, optional `allowed-tools`, and the prompt body.
+- Templates live in `<skill-name>/templates/`, examples in `<skill-name>/examples/`.
+- Skills are **standalone-invokable**: command files are thin wrappers that pass arguments and resolve placement, not the source of the skill's logic.
