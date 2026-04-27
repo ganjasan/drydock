@@ -1,0 +1,21 @@
+{
+  "name": "drydock",
+  "owner": {
+    "name": "Artem Konuchov",
+    "url": "https://github.com/ganjasan"
+  },
+  "metadata": {
+    "description": "Drydock marketplace — hosts the dd workflow plugin (requirements → build → ship)",
+    "version": "0.1.0",
+    "repository": "https://github.com/ganjasan/drydock"
+  },
+  "plugins": [
+    {
+      "name": "dd",
+      "version": "0.1.0",
+      "description": "Drydock workflow rails — disciplined AI-first dev loop under /dd:* (requirements, build, plan, ship)",
+      "source": "./",
+      "strict": false
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+# Drydock dogfood per-repo config — drives this repo's own /dd:* commands
+# via the extension model defined in docs/extension-model.md.
+
+github:
+  org: ganjasan
+  triage_label: status/needs-triage
+
+release:
+  dry_run_default: true
+  gates:
+    - /dd:build:test

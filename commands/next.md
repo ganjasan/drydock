@@ -5,7 +5,7 @@ allowed-tools: Bash, Read, Glob, Grep
 
 Analyze the current workflow state of the repo and propose exactly one next step. If multiple reasonable options exist, list them ranked with a single recommendation at the top.
 
-If `${CLAUDE_PLUGIN_ROOT}/config.yaml` exists, read it for the GitHub Project reference and triage label name. Otherwise, fall back to defaults (`status/needs-triage`).
+Load merged Drydock configuration via `source "${CLAUDE_PLUGIN_ROOT}/lib/config.sh"; dd_config_load`. Read GitHub Project reference (`cfg_has github.project.number`, `cfg_get github.project.number`, `cfg_get github.project.name`) and triage label (`cfg_get github.triage_label`, default `status/needs-triage`). The merged config draws from plugin-root → `~/.drydock/config.yaml` → `<repo>/.drydock/config.yaml`.
 
 ## Decision logic
 
@@ -29,13 +29,13 @@ If on a `feature/*` branch with commits not on the remote, OR no open PR for the
 
 ### 3. Untriaged GitHub issues (configured project only)
 
-If `config.yaml` declares a GitHub Project AND the repo has issues labeled with the configured triage label (default `status/needs-triage`):
+If `cfg_has github.project.number` AND the repo has issues labeled with `cfg_get github.triage_label` (default `status/needs-triage`):
 
 → `/dd:plan:triage` — batch triage pass.
 
 ### 4. Clean main with no work in flight
 
-- If a configured project name exists in `config.yaml`, mention it in the prompt: "Project `<name>` is up to date. Pick an issue, or start a new change."
+- If `cfg_has github.project.name`, mention the project name in the prompt: "Project `<name>` is up to date. Pick an issue, or start a new change."
 - Without a configured project, simply: "Clean state. Pick an issue or start a new change with `/dd:build:start <issue>`."
 
 ### 5. Nothing to do
@@ -58,6 +58,6 @@ Alternative(s): <other reasonable options, if any>
 
 ## Guardrails
 
-- Never assume a project board exists if `config.yaml` does not declare one.
+- Never assume a project board exists if `cfg_has github.project.number` returns false.
 - Base every suggestion on observed state (filesystem, git, `gh`) — never fabricate.
 - If neither active change, branch state, nor untriaged issues are observable, default to "you are up to date" rather than guessing.

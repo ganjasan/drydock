@@ -8,7 +8,7 @@ Thin wrapper that invokes the `stakeholder-profile` skill and places the output 
 
 ## Procedure
 
-1. Resolve target directory via config (`paths.requirements` + `paths.requirements_subdirs.stakeholders`; defaults `requirements/stakeholders/`).
+1. Load merged Drydock config (`source "${CLAUDE_PLUGIN_ROOT}/lib/config.sh"; dd_config_load`). Resolve target directory: `<repo-root>/$(cfg_get paths.requirements)/$(cfg_get paths.requirements_subdirs.stakeholders)/` (defaults `requirements/stakeholders/`).
 
 2. Ask the user (or infer from `$ARGUMENTS`) which category applies:
    - `users/` — direct users of the system

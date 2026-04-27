@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+# session-start lifecycle hook — fires when a Claude Code session starts
+# (events: startup, clear, compact). Drydock dispatches via its plugin-level
+# SessionStart bridge; this script is the per-repo hook.
+#
+# Drydock invokes this script if it exists and is executable at
+# <repo>/.drydock/hooks/session-start.sh.
+#
+# Stdin payload (JSON):
+#   {
+#     "event":       "session-start",
+#     "repo_path":   "/abs/path/to/repo",
+#     "config_path": "/tmp/.../merged-config.json"
+#   }
+#
+# Exit semantics: non-zero is a WARNING — does NOT abort the Claude Code
+# session. Use for session banners, sanity checks, environment reminders.
+#
+# To enable: copy to <repo>/.drydock/hooks/session-start.sh and chmod +x.
+
+set -uo pipefail
+
+payload="$(cat)"
+repo_path="$(jq -r '.repo_path' <<<"$payload")"
+
+# Example: print a banner with the repo name and a count of unprocessed raw items.
+repo_name="$(basename "$repo_path")"
+incoming="${repo_path}/raw/_incoming"
+if [ -d "$incoming" ]; then
+  count="$(find "$incoming" -maxdepth 1 -name '*.md' -type f 2>/dev/null | wc -l | tr -d ' ')"
+  printf '[drydock] %s — %s raw item(s) in inbox\n' "$repo_name" "$count"
+else
+  printf '[drydock] %s — no raw inbox\n' "$repo_name"
+fi
+
+exit 0

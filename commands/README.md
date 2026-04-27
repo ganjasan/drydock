@@ -57,4 +57,4 @@ Each file is a Markdown document with YAML frontmatter (`description`, `argument
 - Command files are kebab-case under `commands/<phase>/<action>.md`.
 - Top-level commands (`status`, `next`) live at `commands/<name>.md`.
 - Every command body ends with a Guardrails section listing what the command MUST NOT do.
-- Commands resolve configuration via `${CLAUDE_PLUGIN_ROOT}/config.yaml` (see `config.yaml.example`); built-in defaults apply when absent.
+- Commands resolve configuration via the merged loader in `lib/config.sh` (`source` it then call `cfg_get`/`cfg_has`/`cfg_array_get`/`cfg_keys_of`). The loader merges three layers (later wins): plugin-root → `~/.drydock/config.yaml` → `<repo>/.drydock/config.yaml`. Built-in defaults apply when no layer declares a key. See `docs/extension-model.md`.

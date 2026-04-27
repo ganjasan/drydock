@@ -4,7 +4,7 @@ status: accepted
 date: 2026-04-27
 deciders: Artem Konuchov
 supersedes: []
-superseded_by: []
+superseded_by: ["0004-universal-workflow-and-project-extensions"]
 traces_to:
   vision: "requirements/vision/vision-and-scope.md"
   change: "openspec/changes/port-apz-commands"
@@ -15,7 +15,7 @@ traces_to:
 
 ## Status
 
-Accepted — 2026-04-27. Recorded as part of the `port-apz-commands` OpenSpec change.
+Accepted — 2026-04-27. **Superseded the same day by [ADR-0004](0004-universal-workflow-and-project-extensions.md)** after the project owner clarified that (a) `raw` ingestion is universal across all their projects, not Apilize-specific, and (b) APZ is to be retired in full rather than kept as a thin layer above Drydock. The reasoning below is preserved for audit; refer to ADR-0004 for the current decision.
 
 ## Context
 

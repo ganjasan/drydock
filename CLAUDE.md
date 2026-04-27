@@ -1,6 +1,6 @@
 # Drydock — Agent Instructions
 
-You are working inside the Drydock repository. Drydock is a Claude Code plugin and methodology for disciplined, AI-first software development: requirements → build → ship.
+You are working inside the Drydock repository. Drydock is a Claude Code plugin and methodology for disciplined, AI-first software development: `raw → requirements → plan → build → ship` (pentaphase workflow from v0.2; see [ADR-0004](requirements/adr/0004-universal-workflow-and-project-extensions.md)).
 
 ## Dogfooding principle
 
@@ -23,14 +23,27 @@ When in doubt, prefer structure over speed — the project is its own test suite
 
 ```
 drydock/
-├── commands/       # /dd:req:*, /dd:build:*, /dd:ship:*, /dd:plan:* command files
-├── agents/         # Subagents invoked by commands
+├── commands/       # /dd:raw:* (v0.2), /dd:req:*, /dd:plan:*, /dd:build:*, /dd:ship:* command files
+├── agents/         # Subagents invoked by commands (raw-classifier added in v0.2)
 ├── skills/         # Reusable skills with optional templates/ and examples/
+├── lib/            # Small shell helpers (config loader, frontmatter helpers)
 ├── templates/      # Top-level templates shared across commands/skills
 ├── requirements/   # Drydock's own requirements (dogfood)
 ├── openspec/       # Drydock's own OpenSpec changes and specs (dogfood)
-└── docs/           # Methodology, workflow, catalog
+└── docs/           # Methodology, workflow, catalog, extension-model, migration
 ```
+
+Project-specific behavior in *consuming* repos lives in:
+
+```
+<consumer-repo>/
+├── .drydock/
+│   ├── config.yaml          # paths, raw sources, area routing, release.gates
+│   └── hooks/               # pre-pr.sh, pre-release.sh, post-capture.sh, ...
+└── .claude/commands/        # project-local slash commands (e.g. /conformance, /parity)
+```
+
+Drydock plugin code itself never references a specific organization or domain — that's enforced by the "Do not" rules below.
 
 ## Naming conventions
 
@@ -42,8 +55,9 @@ drydock/
 
 ## Do not
 
-- Do not add ties to a specific SaaS, company, or domain — Drydock is universal. Domain specifics belong in consumer projects.
-- Do not introduce backward-compatibility shims for APZ command names. A one-time migration guide lives in `docs/migration-from-apz.md`.
+- Do not add ties to a specific SaaS, company, or domain — Drydock is universal. Domain specifics belong in the consumer repo's `.drydock/` and `.claude/commands/` directories. After v0.2 the plugin code must contain zero references to Apilize, WertXpert, INTREAL, or any other client/product name.
+- Do not introduce backward-compatibility shims for APZ command names. APZ is being fully retired (see [ADR-0004](requirements/adr/0004-universal-workflow-and-project-extensions.md)); the one-time migration guide lives in `docs/migration-from-apz.md`.
+- Do not introduce a sibling plugin for project specifics. There is one plugin (`drydock`); project specifics live in `<repo>/.drydock/` via the extension model.
 - Do not auto-push or auto-release. Releases are explicit and gated by the ship pipeline.
 
 ## When starting work

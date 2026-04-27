@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+# post-archive lifecycle hook — fires after /dd:ship:archive completes.
+#
+# Drydock invokes this script if it exists and is executable at
+# <repo>/.drydock/hooks/post-archive.sh.
+#
+# Stdin payload (JSON):
+#   {
+#     "event":       "post-archive",
+#     "repo_path":   "/abs/path/to/repo",
+#     "config_path": "/tmp/.../merged-config.json",
+#     "change_slug": "my-completed-change"
+#   }
+#
+# Exit semantics: non-zero is a WARNING — does NOT roll back the archive.
+# Use for fire-and-forget side-effects: notification, metrics, indexing,
+# documentation-site rebuild, etc. Failures should not block the workflow.
+#
+# To enable: copy to <repo>/.drydock/hooks/post-archive.sh and chmod +x.
+
+set -uo pipefail
+
+payload="$(cat)"
+change_slug="$(jq -r '.change_slug' <<<"$payload")"
+repo_path="$(jq -r '.repo_path'     <<<"$payload")"
+
+# Example: append an entry to a project-wide change-log index.
+index_file="${repo_path}/docs/changes/index.md"
+if [ -f "$index_file" ]; then
+  printf '\n- [%s](../../openspec/specs/%s/) — archived %s\n' \
+    "$change_slug" "$change_slug" "$(date -u +%Y-%m-%d)" \
+    >> "$index_file"
+fi
+
+exit 0

@@ -3,7 +3,7 @@ description: Finalize an OpenSpec change after PR is merged — verify, sync del
 allowed-tools: Bash, SlashCommand
 ---
 
-Run after a PR is merged. Wraps `openspec-verify-change` → `openspec-archive-change` → `openspec-sync-specs` and (optionally) closes the linked issue.
+Run after a PR is merged. Wraps `openspec-verify-change` → `openspec-archive-change` → `openspec-sync-specs` and (optionally) closes the linked issue. Load merged Drydock config (`source "${CLAUDE_PLUGIN_ROOT}/lib/config.sh"; dd_config_load`) and the hook dispatcher (`source "${CLAUDE_PLUGIN_ROOT}/lib/hooks.sh"`).
 
 ## Procedure
 
@@ -22,9 +22,18 @@ Run after a PR is merged. Wraps `openspec-verify-change` → `openspec-archive-c
      --comment "Implemented in PR #<PR>; archived as openspec/specs/<spec>."
    ```
 
-6. Optional project Status update (only if a project is configured): set Status → `Done` for the linked issue.
+6. Optional project Status update (only if `cfg_has github.project.id`): set Status → `Done` for the linked issue using `cfg_get github.project_fields.status.options.done`.
 
-7. Report:
+7. **Post-archive lifecycle hook**:
+
+   ```bash
+   extra=$(jq -cn --arg slug "$change_slug" '{change_slug: $slug}')
+   dd_hook_invoke post-archive "$extra"   # warns on non-zero, does not roll back
+   ```
+
+   If `<repo>/.drydock/hooks/post-archive.sh` exists and is executable, it runs with the payload on stdin. Per the extension-model contract: `post-*` non-zero exit is a warning, not a rollback — the archive remains committed.
+
+8. Report:
 
    ```
    Archived OpenSpec change: <slug>

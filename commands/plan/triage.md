@@ -7,18 +7,18 @@ Walk through every issue carrying the configured triage label (default `status/n
 
 ## Procedure
 
-Read `${CLAUDE_PLUGIN_ROOT}/config.yaml` for `github.triage_label`, project field definitions, and any list of repos to scan. Without configuration, scan only the current repo.
+Load merged Drydock config (`source "${CLAUDE_PLUGIN_ROOT}/lib/config.sh"; dd_config_load`). Read `cfg_get github.triage_label`, project field definitions (`cfg_get github.project_fields.<field>.id`, `cfg_keys_of github.project_fields.<field>.options`), and `cfg_array_get github.triage_repos` for any list of additional repos to scan. Without configuration, scan only the current repo.
 
 ### 1. List candidates
 
 ```
 gh issue list -R <owner>/<repo> \
-  --label "<config.github.triage_label>" \
+  --label "$(cfg_get github.triage_label)" \
   --state open \
   --json number,title,url,labels,projectItems
 ```
 
-If `config.yaml` declares additional repos to triage across, iterate over them in priority order.
+If `cfg_array_get github.triage_repos` returns one or more repos, iterate over them in priority order.
 
 Announce the count: "N issues to triage."
 
@@ -40,7 +40,7 @@ Then ask the user to fill missing fields (skip any already set):
 
 ### 3. Apply updates
 
-Use `gh project item-edit` with field IDs from `config.yaml` to set Priority/Area/Phase/Size.
+Use `gh project item-edit` with field IDs from `cfg_get github.project_fields.<field>.id` to set Priority/Area/Phase/Size.
 
 If a project is configured, set Status to `Backlog` (or `Ready` if the user confirms readiness).
 

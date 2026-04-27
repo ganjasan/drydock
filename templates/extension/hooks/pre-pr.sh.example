@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+# pre-pr lifecycle hook — fires before /dd:ship:pr opens the PR.
+#
+# Drydock invokes this script if it exists and is executable at
+# <repo>/.drydock/hooks/pre-pr.sh.
+#
+# Stdin payload (JSON, single object):
+#   {
+#     "event":       "pre-pr",
+#     "repo_path":   "/abs/path/to/repo",
+#     "config_path": "/tmp/.../merged-config.json",
+#     "branch":      "feature/42-some-work",
+#     "commits":     ["sha1", "sha2", "sha3"]
+#   }
+#
+# Exit semantics: non-zero ABORTS PR creation. This is the user's authority
+# to refuse a PR (content-leak guards, frontmatter checks, license scans, …).
+#
+# To enable: copy to <repo>/.drydock/hooks/pre-pr.sh and chmod +x.
+
+set -euo pipefail
+
+# Read payload.
+payload="$(cat)"
+branch="$(jq -r '.branch'             <<<"$payload")"
+commits="$(jq -r '.commits[]?'        <<<"$payload")"
+repo_path="$(jq -r '.repo_path'       <<<"$payload")"
+
+# Example: refuse PRs that include literal "TODO" lines in newly added content.
+# Replace this with whatever guard rules your project actually needs.
+cd "$repo_path"
+violations="$(
+  for sha in $commits; do
+    git show --unified=0 --format= "$sha" \
+      | awk '/^\+[^+]/ && /\bTODO\b/ { print "  - " FILENAME ":" $0 }' \
+        FILENAME="$sha"
+  done
+)"
+
+if [ -n "$violations" ]; then
+  echo "pre-pr: branch '$branch' adds TODO markers — refusing to open PR" >&2
+  echo "$violations" >&2
+  exit 1
+fi
+
+exit 0
