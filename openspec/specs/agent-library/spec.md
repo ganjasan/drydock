@@ -11,13 +11,25 @@ Each Drydock subagent SHALL be a single Markdown file under `agents/` with kebab
 - **WHEN** any file in `agents/` (other than `README.md`) is loaded
 - **THEN** its frontmatter MUST contain non-empty `name`, `description`, and `tools` fields
 
-### Requirement: Required agents for v0.1
+### Requirement: Required agents
 
-Drydock v0.1 SHALL ship the following subagents: `code-reviewer`, `code-explorer`, `code-architect`, `traces-linter`, `release-coordinator`. The `raw-classifier` agent MUST NOT be shipped in Drydock and remains in APZ.
+Drydock SHALL ship the following subagents: `code-reviewer`, `code-explorer`, `code-architect`, `traces-linter`, `release-coordinator`, `raw-classifier`. The set MAY grow in subsequent versions; existing agents MUST NOT be removed without a major version bump.
 
 #### Scenario: Agent set matches docs
 - **WHEN** `docs/skills-catalog.md` lists an agent in the sub-agents section
-- **THEN** the corresponding file MUST exist at `agents/<name>.md`, except `raw-classifier` which MUST NOT exist in Drydock
+- **THEN** the corresponding file MUST exist at `agents/<name>.md`
+
+#### Scenario: raw-classifier is shipped
+- **WHEN** an inspector lists `agents/`
+- **THEN** `raw-classifier.md` MUST be present alongside the other required agents
+
+#### Scenario: raw-classifier is invocable via the Agent tool
+- **WHEN** `/dd:raw:process` runs and invokes the classifier via the Agent tool with `subagent_type: dd:raw-classifier`
+- **THEN** the agent MUST be resolved and execute against the provided inbox items
+
+#### Scenario: raw-classifier contains no organization-specific content
+- **WHEN** an inspector greps `agents/raw-classifier.md` for any client/product name (e.g. `apilize`, `wertxpert`, `intreal`)
+- **THEN** zero matches MUST be found
 
 ### Requirement: Traces-linter agent verifies bidirectional references
 
