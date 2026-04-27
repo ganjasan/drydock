@@ -8,7 +8,13 @@ Thin wrapper that delegates to the `vision-and-scope` skill, places the output u
 
 ## Procedure
 
-1. Load merged Drydock config (`source "${CLAUDE_PLUGIN_ROOT}/lib/config.sh"; dd_config_load`). Resolve target directory: `<repo-root>/$(cfg_get paths.requirements)/$(cfg_get paths.requirements_subdirs.vision)/`. Defaults are `requirements/` and `vision/`; override via `<repo>/.drydock/config.yaml`.
+1. Load Drydock config and the path resolver:
+   ```bash
+   source "${CLAUDE_PLUGIN_ROOT}/lib/config.sh"; dd_config_load
+   source "${CLAUDE_PLUGIN_ROOT}/lib/paths.sh"
+   target_dir="$(dd_path requirements_subdir vision)"
+   ```
+   Defaults are `<repo>/requirements/vision/`; per-repo overrides via `paths.requirements` and `paths.requirements_subdirs.vision` in `<repo>/.drydock/config.yaml`.
 
 2. Determine the target filename from `$ARGUMENTS`:
    - No argument → `vision-and-scope.md` (the project-level vision).

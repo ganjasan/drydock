@@ -8,7 +8,13 @@ Thin wrapper that invokes the `use-case` skill and places the output at `<repo-r
 
 ## Procedure
 
-1. Load merged Drydock config (`source "${CLAUDE_PLUGIN_ROOT}/lib/config.sh"; dd_config_load`). Resolve target directory: `<repo-root>/$(cfg_get paths.requirements)/$(cfg_get paths.requirements_subdirs.use_cases)/` (defaults `requirements/use-cases/`).
+1. Load Drydock config and path resolver:
+   ```bash
+   source "${CLAUDE_PLUGIN_ROOT}/lib/config.sh"; dd_config_load
+   source "${CLAUDE_PLUGIN_ROOT}/lib/paths.sh"
+   target_dir="$(dd_path requirements_subdir use_cases)"
+   ```
+   Defaults `<repo>/requirements/use-cases/`.
 
 2. Auto-number: scan the directory for files matching `UC-[0-9][0-9][0-9]_*.md`, pick the next number. If the directory does not exist, ask before creating it.
 

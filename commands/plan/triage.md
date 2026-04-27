@@ -40,7 +40,15 @@ Then ask the user to fill missing fields (skip any already set):
 
 ### 3. Apply updates
 
-Use `gh project item-edit` with field IDs from `cfg_get github.project_fields.<field>.id` to set Priority/Area/Phase/Size.
+Use the field helper for each field:
+```bash
+source "${CLAUDE_PLUGIN_ROOT}/lib/gh_project.sh"
+dd_project_field_set "$item_id" priority "$priority"
+dd_project_field_set "$item_id" area     "$area"
+dd_project_field_set "$item_id" phase    "$phase"
+dd_project_field_set "$item_id" status   ready
+```
+Each call no-ops silently if the field is not declared in `github.project_fields.<field>.id`.
 
 If a project is configured, set Status to `Backlog` (or `Ready` if the user confirms readiness).
 

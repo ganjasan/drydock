@@ -4,7 +4,15 @@ argument-hint: "<issue-ref>"
 allowed-tools: Bash, Read, SlashCommand
 ---
 
-Take a triaged backlog issue and create an OpenSpec change in the target repo. Load merged Drydock config (`source "${CLAUDE_PLUGIN_ROOT}/lib/config.sh"; dd_config_load`). By default the target is the current repo; if any layer declares an `area_to_repo` mapping (`cfg_keys_of area_to_repo`), the issue's Area field can route the change to a different repo.
+Take a triaged backlog issue and create an OpenSpec change in the target repo. Load Drydock config and helpers:
+
+```bash
+source "${CLAUDE_PLUGIN_ROOT}/lib/config.sh";       dd_config_load
+source "${CLAUDE_PLUGIN_ROOT}/lib/area_routing.sh"
+source "${CLAUDE_PLUGIN_ROOT}/lib/gh_project.sh"
+```
+
+By default the target is the current repo; if any layer declares an `area_to_repo` mapping, the issue's Area field can route the change to a different repo via `dd_resolve_area`.
 
 ## Procedure
 
@@ -21,15 +29,13 @@ Reject and ask the user to run `/dd:plan:triage` first if any of the following:
 
 ### 3. Resolve target repo
 
-If `cfg_keys_of area_to_repo` returns one or more keys AND the issue has an Area value:
+Call `dd_resolve_area <area>`:
 
-- Look up `cfg_get area_to_repo.<area>`. If non-empty, that's the target repo path (resolved relative to current repo's parent, or absolute).
-- If the Area is set but `cfg_get area_to_repo.<area>` returns empty → fail loudly:
-  - Print the missing mapping.
-  - Offer to add `<area>: <path>` to `<repo>/.drydock/config.yaml`.
-  - Refuse to promote until the mapping is supplied (or the user explicitly chooses the current repo).
+- **Returns absolute path on success** — that's the target repo.
+- **Returns non-zero with fail-loud diagnostic** when `area_to_repo` is set but the area has no mapping. The diagnostic includes a copy-pasteable mapping snippet and lists known mappings. The command must propagate this failure: print the diagnostic, refuse to promote, and offer to add `<area>: <path>` to `<repo>/.drydock/config.yaml`.
+- **Returns the current repo** when `area_to_repo` is unset entirely OR when the value is `.`.
 
-If `cfg_keys_of area_to_repo` returns nothing: target is the current repo (no implicit routing).
+The `dd_resolve_area` helper handles all five edge cases (unset, missing mapping, `.`, absolute path, relative path resolved to parent of current repo) — the command never re-implements them.
 
 ### 4. Navigate
 
@@ -63,7 +69,7 @@ Append (or seed) a "Context" section in the change's `proposal.md`:
 ### 8. Update the issue
 
 - Comment on the issue: `Promoted to OpenSpec change: <target-repo>/openspec/changes/<change-slug>/`.
-- If a project is configured, set Status → `Ready`.
+- If a project is configured, set Status → `Ready` via `dd_project_field_set <item-id> status ready`. The helper no-ops silently when fields are unconfigured.
 
 ### 9. Report
 

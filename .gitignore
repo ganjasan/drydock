@@ -20,8 +20,12 @@ __pycache__/
 .venv/
 venv/
 dist/
-build/
+/build/
 *.egg-info/
+
+# `build/` (above) was previously unanchored and accidentally matched the
+# tracked Drydock `commands/build/` directory. The leading slash now anchors
+# it to the repo root only.
 
 # Logs
 *.log
