@@ -76,6 +76,18 @@ Q&A mode for ambiguous scope. Used by `/dd:build:explore`. File: `skills/openspe
 
 Pre-archive verification: tasks all checked, deltas consistent, design references resolve. Used by `/dd:build:verify` and indirectly by `/dd:ship:archive`. File: `skills/openspec-verify-change/SKILL.md`.
 
+## Feature skills
+
+Shipped in v0.2 via the `add-feature-orchestrator` OpenSpec change. Both skills are standalone-invokable; `/dd:feature` is a thin wrapper around the orchestrator.
+
+### feature-orchestrate
+
+Walk a single idea through all ten Drydock phases — raw capture → code exploration → structured clarification → issue + OpenSpec change → branch + worktree → architecture proposal → design + tasks → implementation loop → tests → draft PR. Pauses at each phase boundary per `feature.pause_after.<phase>` config (defaults: pause after `idea`, `clarify`, `design`, `pr`). Never reimplements per-phase logic — every phase delegates to the corresponding `/dd:raw:capture`, `/dd:plan:add`, `/dd:plan:promote`, `/dd:build:start`, `/dd:build:design`, `/dd:build:code`, `/dd:build:test`, `/dd:ship:pr`, or directly to `dd:code-explorer` / `dd:code-architect` agents. Stepping out at any pause leaves a recoverable workspace; the resume hint cites the per-phase command that picks up from there. Wrapped by `/dd:feature`. File: `skills/feature-orchestrate/SKILL.md`.
+
+### feature-clarify
+
+Run a closed-form structured clarifying-questions round. Each question has exactly one recommended answer, 2–4 named alternatives (each with a one-line reasoning hint), a `[d] discuss this further` option that opens `openspec-explore` for that thread, and a `[?] defer to design.md § Open Questions` option. Generated one at a time conditioned on prior answers; emits as many questions as the spec actually depends on (zero if the codebase + idea leave no ambiguity). Captured answers are appended to `<change>/proposal.md` § Context as `### Clarifying answers`; deferred ones land in `<change>/design.md` § Open Questions. Distinct from `openspec-explore` — that's a free-form thinking partner; this is structured Q&A whose output drops programmatically into OpenSpec artifacts. File: `skills/feature-clarify/SKILL.md`.
+
 ## Ship skills
 
 ### openspec-archive-change

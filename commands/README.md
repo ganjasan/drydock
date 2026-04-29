@@ -8,8 +8,9 @@ Each file is a Markdown document with YAML frontmatter (`description`, `argument
 
 | Command | One-liner |
 |---------|-----------|
-| `/dd:status` | Show current position — repo, branch, worktree, active OpenSpec change, open PRs, optional project board snapshot |
-| `/dd:next`   | Suggest exactly one next concrete action based on observed workflow state |
+| `/dd:status`  | Show current position — repo, branch, worktree, active OpenSpec change, open PRs, optional project board snapshot |
+| `/dd:next`    | Suggest exactly one next concrete action based on observed workflow state |
+| `/dd:feature` | End-to-end shortcut: walk one idea from raw capture to draft PR through all ten phases, pausing at each checkpoint |
 
 ## req/ — Requirements (`/dd:req:*`)
 

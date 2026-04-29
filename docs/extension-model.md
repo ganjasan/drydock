@@ -248,6 +248,49 @@ transcribe: { provider, model, transcribed_at }
 
 Collisions are merged, not duplicated — `/dd:raw:process` unions frontmatter and concatenates bodies under a `--- duplicate captured at <captured_at> ---` separator.
 
+## Feature orchestrator configuration
+
+The `/dd:feature` command (added in v0.2 by the `add-feature-orchestrator` change) walks an idea through all ten Drydock phases with pause points at each boundary. Two configuration knobs:
+
+### `feature.idea_destination`
+
+| Key | Type | Default | Purpose |
+|---|---|---|---|
+| `feature.idea_destination` | `raw` \| `skip` | `raw` | Where the idea-capture phase lands the user's idea |
+
+- `raw` (default) — file the idea as a raw entry under `<paths.raw_root>/<paths.raw_subdirs.ideas>/` via the `raw-capture` skill. The post-capture lifecycle hook fires per the standard protocol.
+- `skip` — do not write a raw entry; the orchestrator jumps straight to issue creation, prompting for the issue title from the idea string.
+
+Use `skip` when you routinely flow ideas already filed as backlog items.
+
+### `feature.pause_after.*`
+
+| Key | Type | Default |
+|---|---|---|
+| `feature.pause_after.idea` | bool | `true` |
+| `feature.pause_after.explore` | bool | `false` |
+| `feature.pause_after.clarify` | bool | `true` |
+| `feature.pause_after.promote` | bool | `false` |
+| `feature.pause_after.design` | bool | `true` |
+| `feature.pause_after.code` | bool | `false` |
+| `feature.pause_after.test` | bool | `false` |
+| `feature.pause_after.pr` | bool | `true` |
+
+When a phase's flag is `true`, `/dd:feature` halts after that phase and prompts `[c] continue · [s] stop here · [r] redo this phase · [j] jump to phase: __`. Default `c` on Enter.
+
+The defaults pause where review materially shapes downstream output (idea sanity-check, clarifying answers, architecture review, PR body) and auto-continue past mechanical steps (exploration, issue creation, branch creation, per-task implementation, test runs).
+
+### Cached intermediate files
+
+`/dd:feature` does not write a phase-state file — phase position is derived from the artifact graph (raw entries, GitHub issues, OpenSpec change, branch, `tasks.md`, PR) via `lib/feature_state.sh::dd_feature_position`. The orchestrator does, however, write two pre-artifact intermediate files that are **gitignored**:
+
+| File | Purpose | Lifetime |
+|---|---|---|
+| `<workdir>/.feature-exploration.md` | Cached `dd:code-explorer` output from phase 2 | Created on phase 2; moved to `<change>/.exploration.md` on phase 4 (after change creation) |
+| `<workdir>/.feature-clarifying-answers.md` | Captured answers from phase 3 if no change exists yet | Created on phase 3; moved to `<change>/.feature-clarifying-answers.md` on phase 4 |
+
+Both are intentionally not version-controlled. Their presence does not advance `dd_feature_position`; they are reusable in-flow caches, not phase-state.
+
 ## Lifecycle hooks
 
 ### Discovery and protocol

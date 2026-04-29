@@ -51,7 +51,7 @@ Drydock plugin code itself never references a specific organization or domain �
 - Agents: kebab-case (`plugin-dev:code-reviewer` style), one YAML frontmatter + prompt.
 - Skills: kebab-case directories under `skills/`, each with a `SKILL.md`.
 - ADRs: `requirements/adr/NNNN-kebab-title.md` with sequential numbering.
-- OpenSpec changes: `openspec/changes/YYYY-MM-DD-kebab-title/`.
+- OpenSpec changes: `openspec/changes/<verb>-<kebab-title>/` — the directory name MUST start with a letter (the openspec CLI rejects names starting with a digit for `status`, `instructions apply`, `archive`, and `new`). Use a verb-led slug like `add-feature-orchestrator`, `port-apz-commands`, `retire-apz`. Do not prepend dates — git history records when the change was created. Past archived changes that carry a `YYYY-MM-DD-` prefix predate this convention; do not retroactively rename them.
 
 ## Do not
 

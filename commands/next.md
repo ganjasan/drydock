@@ -25,6 +25,26 @@ If `${inbox_dir}` exists and contains one or more `*.md` files:
 
 This check is intentionally first: it's cheap, the data has provenance, and processing the inbox often surfaces parent-work that should jump the queue.
 
+### 0a. Active feature flow detected
+
+Source the helper and probe phase position:
+
+```bash
+source "${CLAUDE_PLUGIN_ROOT}/lib/feature_state.sh"
+phase="$(dd_feature_position)"
+```
+
+If `${phase}` is anything other than `none`, suggest `/dd:feature` (resume mode) — the orchestrator picks up at the next pending phase. Cite the detected phase in the "why" line, e.g.:
+
+```
+Suggested next: /dd:feature  — resume the in-flight feature flow
+Why: detected phase 6 (architect draft ready for review). Running /dd:feature with no
+     arguments resumes from there.
+Alternative(s): /dd:build:design  (run the next per-phase command directly)
+```
+
+This check sits **after** raw inbox priority (so a non-empty inbox still wins) and **before** the per-phase OpenSpec checks below. The per-phase suggestion in section 1 is what surfaces when the user prefers to run per-phase commands instead of the orchestrator.
+
 ### 1. Active OpenSpec change with unfinished work
 
 If the current repo contains `openspec/changes/<slug>/.openspec.yaml` with status not `done`:

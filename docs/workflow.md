@@ -214,6 +214,52 @@ Runs `release.gates` from `config.yaml` in order — for example: `[/dd:build:te
 
 The pre-release hook (`<repo>/.drydock/hooks/pre-release.sh`) runs before any gate, if present.
 
+## End-to-end shortcut: `/dd:feature`
+
+When you already know the next eight commands you would type, `/dd:feature` runs them for you with explicit pause points at each checkpoint. It is a convenience over the per-phase chain — not a replacement.
+
+```
+/dd:feature "add a dark-mode toggle in the header"
+  │
+  ├ phase 1 — capture idea          (skills/raw-capture)
+  │   pause: review the filed idea, [c]ontinue
+  │
+  ├ phase 2 — explore code           (dd:code-explorer agent, output cached)
+  │
+  ├ phase 3 — clarify                (skills/feature-clarify)
+  │   pause: review captured answers, [c]ontinue
+  │
+  ├ phase 4 — issue + change         (/dd:plan:add → /dd:plan:promote)
+  │
+  ├ phase 5 — branch + worktree      (/dd:build:start)
+  │
+  ├ phase 6 — architecture           (dd:code-architect agent, reuses cached exploration)
+  │   pause: review design.draft.md, [c]ontinue (promotes to design.md)
+  │
+  ├ phase 7 — design + tasks         (/dd:build:design)
+  │
+  ├ phase 8 — implement              (/dd:build:code looped over tasks)
+  │
+  ├ phase 9 — test                   (/dd:build:test)
+  │
+  └ phase 10 — draft PR              (/dd:ship:pr)
+      pause: review PR body, then `gh pr ready <N>` when ready
+```
+
+Default pauses: `idea`, `clarify`, `design`, `pr`. Tune via `feature.pause_after.<phase>` per `docs/extension-model.md` § feature.
+
+Stepping out at any pause leaves the workspace recoverable. The orchestrator prints the resume hint citing the per-phase command that picks up from there — for example, after stopping at the architecture pause:
+
+```
+Stopped at phase 6 (architecture).
+Saved: openspec/changes/<slug>/design.draft.md
+Resume with: /dd:build:design  (or rerun /dd:feature to continue from here)
+```
+
+`/dd:feature` does NOT auto-merge the PR, auto-archive the change, or auto-cut a release. The flow ends at "draft PR opened"; everything beyond is human review and the existing `/dd:ship:archive` / `/dd:ship:release` commands.
+
+The per-phase commands listed above remain canonical. Use them when you want fine-grained control or when the orchestrator's defaults do not fit (e.g. you have already filed the issue manually — flip `feature.idea_destination: skip` and `/dd:feature` starts at issue creation; or use `/dd:plan:add` directly).
+
 ## Exception list: trivial changes
 
 These do **not** require a full OpenSpec change. Commit directly on a feature branch + PR:

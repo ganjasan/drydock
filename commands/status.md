@@ -24,6 +24,25 @@ Collect and print, in this order:
 - **Linked issue**: if the active change frontmatter includes a `linked_issue` key, OR the branch matches `feature/<N>-*`, fetch that issue via `gh issue view <N> --json number,title,state,labels,url` and show one line.
 - **Open PRs by user**: `gh pr list --author @me --state open --json number,title,url` for the current repo. List each on one line.
 
+### 2a. Active feature flow (only if in flow)
+
+Source the helper and probe phase position:
+
+```bash
+source "${CLAUDE_PLUGIN_ROOT}/lib/feature_state.sh"
+phase="$(dd_feature_position)"
+```
+
+If `${phase}` is anything other than `none`, print one line:
+
+```
+┃   Active feature flow: <label>
+```
+
+Where `<label>` comes from `dd_feature_label "${phase}"` — e.g. `phase 6 — architect draft ready for review`. If `${phase}` is `none`, omit this line.
+
+This signal supplements the OpenSpec change line above; the change reports artifact existence, the feature-flow line reports where the orchestrator would resume.
+
 ### 3. Raw inbox (only if a raw root exists)
 
 ```bash
