@@ -189,3 +189,30 @@ worktree:
 #   classifier:
 #     # Custom category set; defaults to the five canonical Drydock categories.
 #     categories: []   # list of {name, description}
+
+# ---------------------------------------------------------------------------
+# Feature orchestrator (used by /dd:feature — added in v0.2 by the
+# add-feature-orchestrator change). The orchestrator walks an idea through
+# all ten Drydock phases (raw capture → exploration → clarification →
+# issue + change → branch → architecture → design + tasks → implementation
+# → tests → draft PR) with explicit pause points at each phase boundary.
+# ---------------------------------------------------------------------------
+# feature:
+#   # Where the idea-capture phase lands the user's idea.
+#   #   raw  — file as a raw entry under <paths.raw_root>/<paths.raw_subdirs.ideas>/
+#   #   skip — do not write a raw entry; jump straight to issue creation
+#   # Default: raw
+#   # idea_destination: raw
+#
+#   # Per-phase pause toggles. When true, the orchestrator stops after the
+#   # named phase and prompts [c]ontinue / [s]top / [r]edo / [j]ump.
+#   # Defaults: idea, clarify, design, pr → true; rest → false.
+#   # pause_after:
+#   #   idea:     true
+#   #   explore:  false
+#   #   clarify:  true
+#   #   promote:  false
+#   #   design:   true
+#   #   code:     false
+#   #   test:     false
+#   #   pr:       true

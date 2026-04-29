@@ -26,6 +26,13 @@ Skills are designed to be **standalone-invokable** — a user can call `/<skill-
 | `openspec-explore`          | Q&A mode for ambiguous scope, anchored to a change |
 | `openspec-verify-change`    | Pre-archive verification — tasks all checked, deltas consistent |
 
+## Feature skills
+
+| Skill | One-liner |
+|-------|-----------|
+| `feature-orchestrate`   | Walk one idea through all ten Drydock phases — raw → explore → clarify → issue+change → branch → architect → design+tasks → code → test → draft PR. Pauses at each checkpoint. Wrapped by `/dd:feature` |
+| `feature-clarify`       | Structured clarifying-questions round — each question presented with one recommended answer, 2–4 alternatives, a `[d] discuss` escape, and a `[?] defer to Open Questions` option |
+
 ## Ship skills (OpenSpec)
 
 | Skill | One-liner |

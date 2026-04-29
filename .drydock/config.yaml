@@ -1,10 +1,76 @@
 # Drydock dogfood per-repo config — drives this repo's own /dd:* commands
 # via the extension model defined in docs/extension-model.md.
+#
+# Loaded by Drydock's three-layer merge:
+#   plugin defaults  →  ~/.drydock/config.yaml  →  THIS FILE  (wins)
 
+version: "0.2.0"
+
+# ---------------------------------------------------------------------------
+# GitHub integration — DryDock Board (Project #5)
+# ---------------------------------------------------------------------------
 github:
   org: ganjasan
-  triage_label: status/needs-triage
 
+  project:
+    number: 5
+    id:     "PVT_kwHOACpHh84BV4ai"
+    name:   "DryDock Board"
+    url:    "https://github.com/users/ganjasan/projects/5"
+    scope:  "user"   # user-level project (vs org-level for multi-repo setups)
+
+  project_fields:
+    status:
+      id: "PVTSSF_lAHOACpHh84BV4aizhRQ8o4"
+      options:
+        backlog:     "f75ad846"
+        ready:       "cb15acda"
+        in_progress: "47fc9ee4"
+        in_review:   "49cbfc51"
+        done:        "98236657"
+    priority:
+      id: "PVTSSF_lAHOACpHh84BV4aizhRQ9jM"
+      options:
+        p0: "79628723"
+        p1: "0a877460"
+        p2: "da944a9c"
+        p3: "9d11d1d6"
+    phase:
+      id: "PVTSSF_lAHOACpHh84BV4aizhRRAKg"
+      options:
+        phase_1: "23041d9c"
+        phase_2: "49be3ec7"
+        phase_3: "cac70743"
+        phase_4: "be685be9"
+    area:
+      id: "PVTSSF_lAHOACpHh84BV4aizhRRALc"
+      options:
+        commands:     "7a7a3632"
+        skills:       "c7a34f0a"
+        agents:       "9e108fd2"
+        lib:          "f5ce85f6"
+        docs:         "815e620a"
+        requirements: "e7068874"
+        openspec:     "fe2c97ed"
+        infra:        "99bdca34"
+
+  triage_label: "status/needs-triage"
+
+  # Cross-repo issue scan (used by /dd:plan:triage). Drydock is single-repo
+  # for now; placeholder for future drydock-templates / drydock-examples.
+  triage_repos:
+    - "ganjasan/drydock"
+
+# ---------------------------------------------------------------------------
+# Filesystem paths (relative to repo root, defaults shown)
+# ---------------------------------------------------------------------------
+paths:
+  requirements: "requirements"
+  raw_root:     "raw"
+
+# ---------------------------------------------------------------------------
+# Release gates
+# ---------------------------------------------------------------------------
 release:
   dry_run_default: true
   gates:

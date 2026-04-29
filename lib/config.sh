@@ -231,6 +231,15 @@ _cfg_default() {
     worktree.branch_naming)                   echo "feature/<issue-id>-<slug>" ;;
     github.triage_label)                      echo "status/needs-triage" ;;
     release.dry_run_default)                  echo "false" ;;
+    feature.idea_destination)                 echo "raw" ;;
+    feature.pause_after.idea)                 echo "true" ;;
+    feature.pause_after.explore)              echo "false" ;;
+    feature.pause_after.clarify)              echo "true" ;;
+    feature.pause_after.promote)              echo "false" ;;
+    feature.pause_after.design)               echo "true" ;;
+    feature.pause_after.code)                 echo "false" ;;
+    feature.pause_after.test)                 echo "false" ;;
+    feature.pause_after.pr)                   echo "true" ;;
     *)                                        echo "" ;;
   esac
 }
